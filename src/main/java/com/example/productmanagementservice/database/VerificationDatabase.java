@@ -1,5 +1,6 @@
 package com.example.productmanagementservice.database;
 
+import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.entity.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,5 +25,22 @@ public class VerificationDatabase {
             }
         }
         return false;
+    }
+
+    public boolean verificatrionOnExistsApplication(String token, long id){
+        String query = "select * from clients where token = ?";
+
+        List<Client> clients = jdbcTemplate.query(query, new Object[] { token }, new ClientsRowMapper());
+
+        if(clients.isEmpty()){
+            return false;
+        }
+
+        query = "select * from applications where id = ?";
+        List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ClientsRowMapper());
+        if(applications.isEmpty()){
+            return false;
+        }
+        return true;
     }
 }

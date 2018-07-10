@@ -44,33 +44,24 @@ public class DatabaseHandler {
 
         return result;
     }
-
-    public void addDebitCardToApplication(long idApplication, String token){
-        String query = "select * from clients where token = ?";
-
-        List<Client> clients = jdbcTemplate.query(query, new Object[] { token }, new ClientsRowMapper());
-
-        jdbcTemplate.update("UPDATE applications SET product = 'debit-card' WHERE client_id ='"
-                + clients.get(0).getId() + "' AND id ='" + idApplication + "'");
+    public void sentApplicationToConfirmation(long id){
+        jdbcTemplate.update("UPDATE applications SET status = '1' WHERE id = '" + id + "'");
     }
 
-    public void addCreditCardToApplication(long idApplication, String token,int limit){
-        String query = "select * from clients where token = ?";
+    public void addDebitCardToApplication(long idApplication){
+        jdbcTemplate.update("UPDATE applications SET product = 'debit-card' WHERE id ='" + idApplication + "'");
+    }
 
-        List<Client> clients = jdbcTemplate.query(query, new Object[] { token }, new ClientsRowMapper());
-
+    public void addCreditCardToApplication(long idApplication, int limit){
         jdbcTemplate.update("UPDATE applications SET product = 'credit-card', limitOnCard = '"
-                + limit + "' WHERE client_id ='" + clients.get(0).getId() + "' AND id ='" + idApplication + "'");
+                + limit + "' WHERE id ='" + idApplication + "'");
     }
 
-    public void addCreditCashToApplication(long idApplication, String token,int amount, int timeInMonth){
-        String query = "select * from clients where token = ?";
+    public void addCreditCashToApplication(long idApplication,int amount, int timeInMonth){
 
-        List<Client> clients = jdbcTemplate.query(query, new Object[] { token }, new ClientsRowMapper());
 
         jdbcTemplate.update("UPDATE applications SET product = 'credit-cash', amount = '"
-                + amount + "', timeInMonth = '" + timeInMonth + "' WHERE client_id ='"
-                + clients.get(0).getId() + "' AND id ='" + idApplication + "'");
+                + amount + "', timeInMonth = '" + timeInMonth + "' WHERE id ='" + idApplication + "'");
     }
 
     public void createTables(){
