@@ -25,19 +25,24 @@ public class DatabaseHandler {
     public Application createNewApplication(String token){
         String query = "select * from clients where token = ?";
         int status = 0;
-        int result = 0;
+        Application result = new Application();
+        result.setId(-1);
         List<Client> clients = jdbcTemplate.query(query, new Object[] { token }, new ClientsRowMapper());
 
         jdbcTemplate.update("INSERT INTO applications (client_id,status) " +
-                "VALUES ('"+clients.get(0).getId()+"','0')");
+                "VALUES ('"+clients.get(0).getId()+"',0)");
 
-        query = "select id from applications where client_id = ? AND status = ?";
+        query = "select * from applications where client_id = ? AND status = ?";
 
         List<Application> applications = jdbcTemplate.query(query, new Object[] { clients.get(0).getId(),status }, new ApplicationsRowMapper());
 
-        result = applications.get(applications.size()-1).getId();
+        for (Application app: applications){
+            if(app.getId() > result.getId()){
+                result = app;
+            }
+        }
 
-        return new Application(result);
+        return result;
     }
 
     public void addDebitCardToApplication(long idApplication, String token){

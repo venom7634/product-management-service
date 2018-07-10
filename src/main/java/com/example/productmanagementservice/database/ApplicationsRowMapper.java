@@ -9,7 +9,11 @@ import java.sql.SQLException;
     public class ApplicationsRowMapper implements  RowMapper{
 
     public Application mapRow(ResultSet resultSet, int i) throws SQLException {
-        Application app = new Application(resultSet.getInt("id"));
+
+        Application app = new Application();
+        app.setId(resultSet.getInt("id"));
+        app.setStatus(resultSet.getInt("status"));
+        app.setClient_id(resultSet.getInt("client_id"));
 
         return app;
     }

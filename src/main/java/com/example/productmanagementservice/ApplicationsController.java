@@ -4,6 +4,8 @@ import com.example.productmanagementservice.database.DatabaseHandler;
 import com.example.productmanagementservice.database.VerificationDatabase;
 import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.entity.Token;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +40,6 @@ public class ApplicationsController {
 
     @RequestMapping(value = "/applications", method = RequestMethod.POST)
     public Application createApplications(@RequestHeader("token") String token){
-
         return databaseHandler.createNewApplication(token);
     }
 
