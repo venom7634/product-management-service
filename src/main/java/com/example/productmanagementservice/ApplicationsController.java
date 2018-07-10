@@ -4,8 +4,6 @@ import com.example.productmanagementservice.database.DatabaseHandler;
 import com.example.productmanagementservice.database.VerificationDatabase;
 import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.entity.Token;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,20 +43,18 @@ public class ApplicationsController {
 
     @RequestMapping(value="/applications/{id}/debit-card", method = RequestMethod.POST)
     public void addDebitCard(@PathVariable("id") long id, @RequestHeader("token") String token){
-
         databaseHandler.addDebitCardToApplication(id, token);
     }
 
     @RequestMapping(value="/applications/{id}/credit-card", method = RequestMethod.POST)
     public void addCreditCard(@PathVariable("id") long id, @RequestHeader("token") String token,
                               @RequestParam("limit") int limit){
-
         databaseHandler.addCreditCardToApplication(id, token,limit);
     }
+
     @RequestMapping(value="/applications/{id}/credit-cash", method = RequestMethod.POST)
     public void addCreditCard(@PathVariable("id") long id, @RequestHeader("token") String token,
                               @RequestParam("amount") int amount,@RequestParam("timeInMonth") int timeInMonth ){
-
         databaseHandler.addCreditCashToApplication(id, token,amount,timeInMonth);
     }
 

@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class DatabaseHandler {
@@ -27,6 +26,7 @@ public class DatabaseHandler {
         int status = 0;
         Application result = new Application();
         result.setId(-1);
+
         List<Client> clients = jdbcTemplate.query(query, new Object[] { token }, new ClientsRowMapper());
 
         jdbcTemplate.update("INSERT INTO applications (client_id,status) " +
@@ -69,7 +69,7 @@ public class DatabaseHandler {
         List<Client> clients = jdbcTemplate.query(query, new Object[] { token }, new ClientsRowMapper());
 
         jdbcTemplate.update("UPDATE applications SET product = 'credit-cash', amount = '"
-                + amount + "', timeInMonth = '" +timeInMonth + "' WHERE client_id ='"
+                + amount + "', timeInMonth = '" + timeInMonth + "' WHERE client_id ='"
                 + clients.get(0).getId() + "' AND id ='" + idApplication + "'");
     }
 

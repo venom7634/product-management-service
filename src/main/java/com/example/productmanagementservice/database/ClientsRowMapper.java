@@ -11,6 +11,7 @@ public class ClientsRowMapper implements RowMapper {
 
     public Client mapRow(ResultSet resultSet, int i) throws SQLException {
         Client client = new Client();
+
         client.setLogin(resultSet.getString("login"));
         client.setPassword(resultSet.getString("password"));
         client.setSecurity_id(resultSet.getInt("security"));
