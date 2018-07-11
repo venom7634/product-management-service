@@ -55,4 +55,16 @@ public class VerificationDatabase {
         }
         return false;
     }
+
+    public boolean checkProductInApplicationsClient(long id){
+        String query = "select * from applications where id = ?";
+
+        List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
+
+        query = "select * from applications where product = ? and id = ? and status = 2";
+
+        applications = jdbcTemplate.query(query,new Object[] {applications.get(0).getProduct(),id }, new ApplicationsRowMapper());
+
+        return !applications.isEmpty();
+    }
 }

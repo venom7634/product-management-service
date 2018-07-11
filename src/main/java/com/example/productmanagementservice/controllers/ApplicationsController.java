@@ -61,7 +61,7 @@ public class ApplicationsController {
         return applicationService.getApplicationsForApproval(token);
     }
 
-    @RequestMapping(value = "/applications/{id}/approve", method = RequestMethod.POST)
+    @RequestMapping(value = "/applications/{id}/approve", method = RequestMethod.POST)//ДОБАВИТЬ ВАЛИДАЦИЮ
     public ResponseEntity<String> approveApplication(@PathVariable long id, @RequestHeader("token") String token){
         return applicationService.approveApplication(id, token);
     }
@@ -71,6 +71,5 @@ public class ApplicationsController {
                                                       @RequestBody Reason reason){
         return applicationService.negativeApplication(id,token,reason.getReason());
     }
-
 
 }

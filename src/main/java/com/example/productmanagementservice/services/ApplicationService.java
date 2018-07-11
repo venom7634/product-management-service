@@ -94,7 +94,7 @@ public class ApplicationService {
     public ResponseEntity<String> sendApplicationForApproval(String token, long id){
         ResponseEntity<String> responseEntity;
 
-        if(!loginService.checkTokenOnValidation(token)){
+        if(!loginService.checkTokenOnValidation(token) || verificationDatabase.checkProductInApplicationsClient(id)){
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(verificationDatabase.verificationOnExistsApplication(token, id)){
             databaseHandler.sendApplicationToConfirmation(id);

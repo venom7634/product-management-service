@@ -16,11 +16,17 @@ import java.util.List;
 @Component
 public class DatabaseHandler {
 
+    private final JdbcTemplate jdbcTemplate;
+    private final VerificationDatabase verificationDatabase;
+
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    public DatabaseHandler(JdbcTemplate jdbcTemplate, VerificationDatabase verificationDatabase) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.verificationDatabase = verificationDatabase;
+    }
 
     public void sendApplicationToConfirmation(long id){
-        jdbcTemplate.update("UPDATE applications SET status = '1' WHERE id = ?", id);
+            jdbcTemplate.update("UPDATE applications SET status = '1' WHERE id = ?", id);
     }
 
     public void addDebitCardToApplication(long idApplication){
@@ -86,7 +92,13 @@ public class DatabaseHandler {
     }
 
     public void approveApplication(long id){
+
+        String query = "select * from applications where id = ?";
         jdbcTemplate.update("UPDATE applications SET status = 2 WHERE id = ?", id);
+
+        List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
+        String product = applications.get(0).getProduct();
+        jdbcTemplate.update("UPDATE applications SET status = 3, description = 'One user may have one product' WHERE product = ?", product);
     }
 
     public void negativeApplication(long id, String reason){
