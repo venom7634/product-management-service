@@ -51,7 +51,7 @@ public class VerificationDatabase {
         List<User> users = jdbcTemplate.query(query, new Object[] { token }, new UsersRowMapper());
 
         if(!users.isEmpty()){
-            return users.get(0).getSecurity_id() == 1;
+            return users.get(0).getSecurity_id() == 0;
         }
         return false;
     }

@@ -1,6 +1,7 @@
 package com.example.productmanagementservice.database;
 
 import com.example.productmanagementservice.database.mappers.ApplicationsRowMapper;
+import com.example.productmanagementservice.database.mappers.ProductsDescriptionRowMapper;
 import com.example.productmanagementservice.database.mappers.ProductsRowMapper;
 import com.example.productmanagementservice.database.mappers.UsersRowMapper;
 import com.example.productmanagementservice.entity.Application;
@@ -73,7 +74,7 @@ public class DatabaseHandler {
 
         String query = "select * from products where id = ?";
 
-        return  (Product) jdbcTemplate.queryForObject(query, new Object[] { id }, new ProductsRowMapper());
+        return  (Product) jdbcTemplate.queryForObject(query, new Object[] { id }, new ProductsDescriptionRowMapper());
     }
 
     public String getLoginByToken(String token){
@@ -90,5 +91,16 @@ public class DatabaseHandler {
 
     public void negativeApplication(long id, String reason){
         jdbcTemplate.update("UPDATE applications SET status = 3, description = ? WHERE id = ?", reason, id);
+    }
+
+    public List<Product> getProductsForClient(long id){
+        String query = "SELECT products.id, products.name FROM products " +
+                "INNER JOIN applications ON applications.product = products.name " +
+                "INNER JOIN clients ON clients.id = applications.id " +
+                "WHERE applications.status = 2 AND clients.id = ? ";
+
+        List<Product> products = jdbcTemplate.query(query, new Object[] { id },new ProductsRowMapper());
+
+        return products;
     }
 }

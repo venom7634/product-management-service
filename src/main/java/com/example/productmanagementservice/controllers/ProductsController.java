@@ -1,11 +1,13 @@
 package com.example.productmanagementservice.controllers;
 
+import com.example.productmanagementservice.entity.data.Reason;
 import com.example.productmanagementservice.entity.products.Product;
 import com.example.productmanagementservice.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class ProductsController {
@@ -32,5 +34,10 @@ public class ProductsController {
     @RequestMapping(value = "/products/credit-cash", method = RequestMethod.GET)
     public Product getDescriptionCreditCash(){
         return productService.getDescriptionCreditCash();
+    }
+
+    @RequestMapping(value = "/clients/{id}/products", method = RequestMethod.GET)
+    public ResponseEntity<List<Product>> getClientProducts(@PathVariable long id, @RequestHeader("token") String token){
+        return productService.getProductsForClient(token,id);
     }
 }

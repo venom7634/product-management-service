@@ -72,4 +72,5 @@ public class ApplicationsController {
         return applicationService.negativeApplication(id,token,reason.getReason());
     }
 
+
 }
