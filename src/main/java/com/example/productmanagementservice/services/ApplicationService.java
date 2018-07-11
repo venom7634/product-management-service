@@ -130,4 +130,31 @@ public class ApplicationService {
         return responseEntity;
     }
 
+    public ResponseEntity<String> approveApplication(long id, String token){
+        ResponseEntity<String> responseEntity;
+
+        if(!loginService.checkTokenOnValidation(token)){
+            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } else if(verificationDatabase.authenticationOfBankEmployee(token)){
+            databaseHandler.approveApplication(id);
+            responseEntity = new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return responseEntity;
+    }
+
+    public ResponseEntity<String> negativeApplication(long id, String token, String reason){
+        ResponseEntity<String> responseEntity;
+
+        if(!loginService.checkTokenOnValidation(token)){
+            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } else if(verificationDatabase.authenticationOfBankEmployee(token)){
+            databaseHandler.negativeApplication(id,reason);
+            responseEntity = new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return responseEntity;
+    }
 }

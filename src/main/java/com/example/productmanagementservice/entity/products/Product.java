@@ -1,19 +1,34 @@
 package com.example.productmanagementservice.entity.products;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class Product {
 
     String description;
+
     @JsonIgnore
     Integer id;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    String name;
 
     public Product(){
 
     }
 
-    public Product(String description){
+    public Product(String description, Integer id, String name) {
         this.description = description;
+        this.id = id;
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Integer getId() {

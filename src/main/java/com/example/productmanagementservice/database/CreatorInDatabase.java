@@ -67,6 +67,7 @@ public class CreatorInDatabase {
                 "limitOnCard INTEGER," +
                 "amount INTEGER,"+
                 "timeInMonth INTEGER," +
+                "description NCHAR(300)," +
                 "FOREIGN KEY(client_id) REFERENCES clients(id))");
 
         jdbcTemplate.execute("CREATE TABLE products(" +

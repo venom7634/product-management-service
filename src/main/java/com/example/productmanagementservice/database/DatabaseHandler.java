@@ -83,4 +83,12 @@ public class DatabaseHandler {
 
         return user.getLogin();
     }
+
+    public void approveApplication(long id){
+        jdbcTemplate.update("UPDATE applications SET status = 2 WHERE id = ?", id);
+    }
+
+    public void negativeApplication(long id, String reason){
+        jdbcTemplate.update("UPDATE applications SET status = 3, description = ? WHERE id = ?", reason, id);
+    }
 }

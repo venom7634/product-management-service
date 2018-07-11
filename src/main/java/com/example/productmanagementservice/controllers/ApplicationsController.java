@@ -1,6 +1,7 @@
 package com.example.productmanagementservice.controllers;
 
 import com.example.productmanagementservice.entity.Application;
+import com.example.productmanagementservice.entity.data.Reason;
 import com.example.productmanagementservice.entity.products.CreditCard;
 import com.example.productmanagementservice.entity.products.CreditCash;
 import com.example.productmanagementservice.services.ApplicationService;
@@ -60,14 +61,15 @@ public class ApplicationsController {
         return applicationService.getApplicationsForApproval(token);
     }
 
-//    @RequestMapping(value = "/applications/{id}/approve", method = RequestMethod.GET)
-//    public List<Application> approveApplication(@PathVariable long id, @RequestHeader("token") String token){
-//        return applicationService.getApplicationsForApproval(token);
-//    }
-//
-//    @RequestMapping(value = "/applications/{id}/negative", method = RequestMethod.GET)
-//    public List<Application> negativeApplication(@PathVariable long id, @RequestHeader("token") String token){
-//        return applicationService.getApplicationsForApproval(token);
-//    }
+    @RequestMapping(value = "/applications/{id}/approve", method = RequestMethod.POST)
+    public ResponseEntity<String> approveApplication(@PathVariable long id, @RequestHeader("token") String token){
+        return applicationService.approveApplication(id, token);
+    }
+
+    @RequestMapping(value = "/applications/{id}/negative", method = RequestMethod.GET)
+    public ResponseEntity<String> negativeApplication(@PathVariable long id, @RequestHeader("token") String token,
+                                                      @RequestBody Reason reason){
+        return applicationService.negativeApplication(id,token,reason.getReason());
+    }
 
 }

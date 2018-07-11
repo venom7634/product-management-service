@@ -10,7 +10,7 @@ import java.sql.SQLException;
     public class ApplicationsRowMapper implements  RowMapper{
 
     public Application mapRow(ResultSet resultSet, int i) throws SQLException {
-        String[] columns = {"product", "limitOnCard", "timeInMonth", "amount"};
+        String[] columns = {"product", "limitOnCard", "timeInMonth", "amount", "description"};
         Application app = new Application();
 
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
@@ -35,6 +35,9 @@ import java.sql.SQLException;
                           break;
                       case "amount":
                           app.setAmount(resultSet.getString("amount"));
+                          break;
+                      case "description":
+                          app.setDescription(resultSet.getString("description"));
                           break;
                   }
                 }

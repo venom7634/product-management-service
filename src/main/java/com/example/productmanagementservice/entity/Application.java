@@ -18,7 +18,17 @@ public class Application {
     private String amount;
     private String timeInMonth;
 
+    private String description;
+
     public Application(){
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getId() {
