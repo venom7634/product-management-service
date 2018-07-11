@@ -10,11 +10,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoginHandler {
-    @Autowired
-    private DatabaseHandler databaseHandler;
+    private final DatabaseHandler databaseHandler;
+
+    private final VerificationDatabase verificationDatabase;
 
     @Autowired
-    private VerificationDatabase verificationDatabase;
+    public LoginHandler(DatabaseHandler databaseHandler, VerificationDatabase verificationDatabase) {
+        this.databaseHandler = databaseHandler;
+        this.verificationDatabase = verificationDatabase;
+    }
 
     public ResponseEntity<Token> login(String login, String password){
         ResponseEntity<Token> responseEntity;

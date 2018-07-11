@@ -17,12 +17,8 @@ import java.util.List;
 @Component
 public class DatabaseHandler {
 
-    private final JdbcTemplate jdbcTemplate;
-
     @Autowired
-    public DatabaseHandler(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private JdbcTemplate jdbcTemplate;
 
     public Application createNewApplication(String token){
         String query = "select * from clients where token = ?";
@@ -73,11 +69,6 @@ public class DatabaseHandler {
     public void addCreditCardToApplication(long idApplication, int limit){
         jdbcTemplate.update("UPDATE applications SET product = 'credit-card',amount = null, timeInMonth = null," +
                 " limitOnCard = '" + limit + "' WHERE id = " + idApplication);
-
-        String query = "select * from applications where id = ?";
-
-        List<Application> applications = jdbcTemplate.query(query, new Object[] { idApplication }, new ApplicationsRowMapper());
-        applications.get(0);
     }
 
     public void addCreditCashToApplication(long idApplication,int amount, int timeInMonth){
@@ -114,15 +105,4 @@ public class DatabaseHandler {
                 "VALUES ('viktor','1234','','1','Viktor','3 years experience')");
     }
 
-    public Application test(String token, long id){
-        String query = "select * from clients where token = ?";
-
-        List<Client> clients = jdbcTemplate.query(query, new Object[] { token }, new ClientsRowMapper());
-
-        query = "select * from applications where client_id = ? AND id = ?";
-
-        List<Application> applications = jdbcTemplate.query(query, new Object[] { clients.get(0).getId(),id }, new ApplicationsRowMapper());
-
-        return applications.get(0);
-    }
 }

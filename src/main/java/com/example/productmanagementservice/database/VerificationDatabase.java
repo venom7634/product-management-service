@@ -11,8 +11,12 @@ import java.util.List;
 @Component
 public class VerificationDatabase {
 
+    private final JdbcTemplate jdbcTemplate;
+
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    public VerificationDatabase(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     public boolean checkingUser(String login, String password){
         String query = "select * from clients where login = ?";
@@ -20,9 +24,7 @@ public class VerificationDatabase {
         List<Client> clients = jdbcTemplate.query(query, new Object[] { login }, new ClientsRowMapper());
 
         if(!clients.isEmpty()){
-            if(clients.get(0).getPassword().equals(password)){
-                return true;
-            }
+            return clients.get(0).getPassword().equals(password);
         }
         return false;
     }
@@ -38,9 +40,6 @@ public class VerificationDatabase {
 
         query = "select * from applications where id = ? AND status = 0";
         List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
-        if(applications.isEmpty()){
-            return false;
-        }
-        return true;
+        return !applications.isEmpty();
     }
 }

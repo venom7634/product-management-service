@@ -51,9 +51,4 @@ public class ApplicationsController {
         return applicationHandler.sendApplicationForApproval(token,id);
     }
 
-    @RequestMapping(value = "/test/{id}", method = RequestMethod.GET)
-    public Application test(@RequestHeader("token") String token, @PathVariable long id){
-
-        return databaseHandler.test(token, id);
-    }
 }

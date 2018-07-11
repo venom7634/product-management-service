@@ -11,11 +11,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApplicationHandler {
 
-    @Autowired
-    private DatabaseHandler databaseHandler;
+    private final DatabaseHandler databaseHandler;
+
+    private final VerificationDatabase verificationDatabase;
 
     @Autowired
-    private VerificationDatabase verificationDatabase;
+    public ApplicationHandler(DatabaseHandler databaseHandler, VerificationDatabase verificationDatabase) {
+        this.databaseHandler = databaseHandler;
+        this.verificationDatabase = verificationDatabase;
+    }
 
     public Application createApplication(String token){
         return databaseHandler.createNewApplication(token);
