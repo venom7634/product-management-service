@@ -28,7 +28,6 @@ public class ProductsController {
     @RequestMapping(value = "/products/credit-card", method = RequestMethod.GET)
     public Product getDescriptionCreditCard(){
         return productService.getDescriptionCreditCard();
-
     }
 
     @RequestMapping(value = "/products/credit-cash", method = RequestMethod.GET)
