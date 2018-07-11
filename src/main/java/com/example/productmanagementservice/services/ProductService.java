@@ -44,7 +44,7 @@ public class ProductService {
         if(!loginService.checkTokenOnValidation(token)){
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(verificationDatabase.authenticationOfBankEmployee(token)){
-            responseEntity = new ResponseEntity<>(HttpStatus.OK);
+            responseEntity = new ResponseEntity<>(databaseHandler.getProductsForClient(id),HttpStatus.OK);
         } else {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

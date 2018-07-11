@@ -41,13 +41,13 @@ public class DatabaseHandler {
 
     public void addCreditCashToApplication(long idApplication,int amount, int timeInMonth){
         jdbcTemplate.update("UPDATE applications SET product = 'credit-cash',limitOnCard = null,  amount = ?," +
-                "timeInMonth = ? WHERE id = ?",amount, timeInMonth, idApplication + "'");
+                "timeInMonth = ? WHERE id = ?",amount, timeInMonth, idApplication);
     }
 
     public List<Application> getListApplicationsOfDataBase(String token){
         String query = "select applications.id, status, client_id, product, limitOnCard, amount, timeInMonth " +
                 "from applications " +
-                "INNER JOIN users ON client_id = clients.id " +
+                "INNER JOIN users ON client_id = users.id " +
                 "where token = ? AND status = 1";
 
         List<Application> applications = jdbcTemplate.query(query, new Object[] { token }, new ApplicationsRowMapper());
@@ -57,7 +57,7 @@ public class DatabaseHandler {
     public List<Application> getListApplicationsOfDataBase(long id){
         String query = "select applications.id, status, client_id, product, limitOnCard, amount, timeInMonth " +
                 "from applications " +
-                "INNER JOIN users ON client_id = clients.id " +
+                "INNER JOIN users ON client_id = users.id " +
                 "where client_id = ? AND status = 1";
 
         List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
@@ -98,7 +98,8 @@ public class DatabaseHandler {
 
         List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
         String product = applications.get(0).getProduct();
-        jdbcTemplate.update("UPDATE applications SET status = 3, description = 'One user may have one product' WHERE product = ?", product);
+        jdbcTemplate.update("UPDATE applications SET status = 3, " +
+                "description = 'One user can have only one product of the same type' WHERE product = ?", product);
     }
 
     public void negativeApplication(long id, String reason){
@@ -108,8 +109,8 @@ public class DatabaseHandler {
     public List<Product> getProductsForClient(long id){
         String query = "SELECT products.id, products.name FROM products " +
                 "INNER JOIN applications ON applications.product = products.name " +
-                "INNER JOIN clients ON clients.id = applications.id " +
-                "WHERE applications.status = 2 AND clients.id = ? ";
+                "INNER JOIN users ON users.id = applications.id " +
+                "WHERE applications.status = 2 AND users.id = ? ";
 
         List<Product> products = jdbcTemplate.query(query, new Object[] { id },new ProductsRowMapper());
 

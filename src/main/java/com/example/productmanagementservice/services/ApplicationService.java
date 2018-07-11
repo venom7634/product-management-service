@@ -133,7 +133,7 @@ public class ApplicationService {
     public ResponseEntity<String> approveApplication(long id, String token){
         ResponseEntity<String> responseEntity;
 
-        if(!loginService.checkTokenOnValidation(token)){
+        if(!loginService.checkTokenOnValidation(token) || verificationDatabase.checkProductInApplicationsClient(id)){
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(verificationDatabase.authenticationOfBankEmployee(token)){
             databaseHandler.approveApplication(id);

@@ -68,7 +68,7 @@ public class CreatorInDatabase {
                 "amount INTEGER,"+
                 "timeInMonth INTEGER," +
                 "description NCHAR(300)," +
-                "FOREIGN KEY(client_id) REFERENCES clients(id))");
+                "FOREIGN KEY(client_id) REFERENCES users(id))");
 
         jdbcTemplate.execute("CREATE TABLE products(" +
                 "id  INTEGER PRIMARY KEY AUTOINCREMENT," +
