@@ -1,7 +1,7 @@
 package com.example.productmanagementservice.database;
 
 import com.example.productmanagementservice.entity.Application;
-import com.example.productmanagementservice.entity.Client;
+import com.example.productmanagementservice.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.crypto.MacProvider;
@@ -26,14 +26,14 @@ public class DatabaseHandler {
         Application result = new Application();
         result.setId(-1);
 
-        List<Client> clients = jdbcTemplate.query(query, new Object[] { token }, new ClientsRowMapper());
+        List<User> users = jdbcTemplate.query(query, new Object[] { token }, new UsersRowMapper());
 
         jdbcTemplate.update("INSERT INTO applications (client_id,status) " +
-                "VALUES ('"+clients.get(0).getId()+"',0)");
+                "VALUES ('"+ users.get(0).getId()+"',0)");
 
         query = "select * from applications where client_id = ? AND status = ?";
 
-        List<Application> applications = jdbcTemplate.query(query, new Object[] { clients.get(0).getId(),status }, new ApplicationsRowMapper());
+        List<Application> applications = jdbcTemplate.query(query, new Object[] { users.get(0).getId(),status }, new ApplicationsRowMapper());
 
         for (Application app: applications){
             if(app.getId() > result.getId()){
@@ -57,7 +57,7 @@ public class DatabaseHandler {
         return token;
     }
 
-    public void sentApplicationToConfirmation(long id){
+    public void sendApplicationToConfirmation(long id){
         jdbcTemplate.update("UPDATE applications SET status = '1' WHERE id = '" + id + "'");
     }
 
@@ -74,6 +74,26 @@ public class DatabaseHandler {
     public void addCreditCashToApplication(long idApplication,int amount, int timeInMonth){
         jdbcTemplate.update("UPDATE applications SET product = 'credit-cash',limitOnCard = null,  amount = '"
                 + amount + "', timeInMonth = '" + timeInMonth + "' WHERE id ='" + idApplication + "'");
+    }
+
+    public List<Application> getListApplicationsOfDataBase(String token){
+        String query = "select applications.id, status, client_id, product, limitOnCard, amount, timeInMonth " +
+                "from applications " +
+                "INNER JOIN clients ON client_id = clients.id " +
+                "where token = ? AND status = 1";
+
+        List<Application> applications = jdbcTemplate.query(query, new Object[] { token }, new ApplicationsRowMapper());
+        return applications;
+    }
+
+    public List<Application> getListApplicationsOfDataBase(long id){
+        String query = "select applications.id, status, client_id, product, limitOnCard, amount, timeInMonth " +
+                "from applications " +
+                "INNER JOIN clients ON client_id = clients.id " +
+                "where client_id = ? AND status = 1";
+
+        List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
+        return applications;
     }
 
     @PostConstruct

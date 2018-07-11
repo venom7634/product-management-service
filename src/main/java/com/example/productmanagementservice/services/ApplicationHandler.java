@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ApplicationHandler {
 
@@ -73,11 +75,28 @@ public class ApplicationHandler {
         ResponseEntity<String> responseEntity;
 
         if(verificationDatabase.verificationOnExistsApplication(token, id)){
-            databaseHandler.sentApplicationToConfirmation(id);
+            databaseHandler.sendApplicationToConfirmation(id);
             responseEntity = new ResponseEntity<>(HttpStatus.OK);
         } else {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return responseEntity;
+    }
+
+    public List<Application> getApplicationsForApproval(String token){
+        return databaseHandler.getListApplicationsOfDataBase(token);
+    }
+
+    public ResponseEntity<List<Application>> getApplicationsClientForApproval(long id, String token){
+        ResponseEntity<List<Application>> responseEntity;
+
+        if(verificationDatabase.authenticationOfBankEmployee(token)){
+
+            responseEntity = new ResponseEntity<>(databaseHandler.getListApplicationsOfDataBase(id),HttpStatus.OK);
+        } else {
+            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        return responseEntity;
+
     }
 }

@@ -1,7 +1,7 @@
 package com.example.productmanagementservice.database;
 
 import com.example.productmanagementservice.entity.Application;
-import com.example.productmanagementservice.entity.Client;
+import com.example.productmanagementservice.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -21,10 +21,10 @@ public class VerificationDatabase {
     public boolean checkingUser(String login, String password){
         String query = "select * from clients where login = ?";
 
-        List<Client> clients = jdbcTemplate.query(query, new Object[] { login }, new ClientsRowMapper());
+        List<User> users = jdbcTemplate.query(query, new Object[] { login }, new UsersRowMapper());
 
-        if(!clients.isEmpty()){
-            return clients.get(0).getPassword().equals(password);
+        if(!users.isEmpty()){
+            return users.get(0).getPassword().equals(password);
         }
         return false;
     }
@@ -32,14 +32,25 @@ public class VerificationDatabase {
     public boolean verificationOnExistsApplication(String token, long id){
         String query = "select * from clients where token = ?";
 
-        List<Client> clients = jdbcTemplate.query(query, new Object[] { token }, new ClientsRowMapper());
+        List<User> users = jdbcTemplate.query(query, new Object[] { token }, new UsersRowMapper());
 
-        if(clients.isEmpty()){
+        if(users.isEmpty()){
             return false;
         }
 
         query = "select * from applications where id = ? AND status = 0";
         List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
         return !applications.isEmpty();
+    }
+
+    public boolean authenticationOfBankEmployee(String token){
+        String query = "select * from clients where token = ?";
+
+        List<User> users = jdbcTemplate.query(query, new Object[] { token }, new UsersRowMapper());
+
+        if(!users.isEmpty()){
+            return users.get(0).getSecurity_id() == 1;
+        }
+        return false;
     }
 }

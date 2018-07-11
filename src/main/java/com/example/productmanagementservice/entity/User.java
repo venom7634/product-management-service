@@ -1,6 +1,6 @@
 package com.example.productmanagementservice.entity;
 
-public class Client {
+public class User {
 
     int id;
     String login;
@@ -10,11 +10,11 @@ public class Client {
     String name;
     String description;
 
-    public Client(){
+    public User(){
 
     }
 
-    public Client(int id, String login, String password, String token, int security_id, String name, String description) {
+    public User(int id, String login, String password, String token, int security_id, String name, String description) {
         this.id = id;
         this.login = login;
         this.password = password;

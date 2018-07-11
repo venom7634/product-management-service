@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class ApplicationsController {
 
@@ -51,4 +53,14 @@ public class ApplicationsController {
         return applicationHandler.sendApplicationForApproval(token,id);
     }
 
+    @RequestMapping(value = "/applications", method = RequestMethod.GET)
+    public ResponseEntity<List<Application>> getListApplicationsClientForApproval(@RequestParam("userId") long id,
+                                                                  @RequestHeader("token") String token){
+        return applicationHandler.getApplicationsClientForApproval(id,token);
+    }
+
+    @RequestMapping(value = "/applications/my", method = RequestMethod.GET)
+    public List<Application> getMyListApplicationsForApproval(@RequestHeader("token") String token){
+        return applicationHandler.getApplicationsForApproval(token);
+    }
 }
