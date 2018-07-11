@@ -1,5 +1,7 @@
 package com.example.productmanagementservice.database;
 
+import com.example.productmanagementservice.database.mappers.ApplicationsRowMapper;
+import com.example.productmanagementservice.database.mappers.UsersRowMapper;
 import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;

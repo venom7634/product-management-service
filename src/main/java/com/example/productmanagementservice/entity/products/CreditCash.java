@@ -1,6 +1,6 @@
 package com.example.productmanagementservice.entity.products;
 
-public class CreditCash {
+public class CreditCash extends Product {
 
     int timeInMonth;
     int amount;

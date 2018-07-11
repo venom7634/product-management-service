@@ -1,6 +1,5 @@
 package com.example.productmanagementservice.controllers;
 
-import com.example.productmanagementservice.database.DatabaseHandler;
 import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.entity.products.CreditCard;
 import com.example.productmanagementservice.entity.products.CreditCash;
@@ -14,14 +13,11 @@ import java.util.List;
 @RestController
 public class ApplicationsController {
 
-    private final DatabaseHandler databaseHandler;
-
     private final ApplicationHandler applicationHandler;
 
     @Autowired
-    public ApplicationsController(ApplicationHandler applicationHandler, DatabaseHandler databaseHandler) {
+    public ApplicationsController(ApplicationHandler applicationHandler) {
         this.applicationHandler = applicationHandler;
-        this.databaseHandler = databaseHandler;
     }
 
 

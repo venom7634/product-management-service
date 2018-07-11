@@ -1,5 +1,6 @@
 package com.example.productmanagementservice.services;
 
+import com.example.productmanagementservice.database.CreatorInDatabase;
 import com.example.productmanagementservice.database.DatabaseHandler;
 import com.example.productmanagementservice.database.VerificationDatabase;
 import com.example.productmanagementservice.entity.Application;
@@ -13,18 +14,22 @@ import java.util.List;
 @Service
 public class ApplicationHandler {
 
+    private final CreatorInDatabase creatorInDatabase;
+
     private final DatabaseHandler databaseHandler;
 
     private final VerificationDatabase verificationDatabase;
 
     @Autowired
-    public ApplicationHandler(DatabaseHandler databaseHandler, VerificationDatabase verificationDatabase) {
+    public ApplicationHandler(DatabaseHandler databaseHandler,
+                              VerificationDatabase verificationDatabase, CreatorInDatabase creatorInDatabase) {
         this.databaseHandler = databaseHandler;
         this.verificationDatabase = verificationDatabase;
+        this.creatorInDatabase = creatorInDatabase;
     }
 
     public Application createApplication(String token){
-        return databaseHandler.createNewApplication(token);
+        return creatorInDatabase.createNewApplication(token);
     }
 
     public ResponseEntity<String> addDebitCardToApplication(String token, long id) {
