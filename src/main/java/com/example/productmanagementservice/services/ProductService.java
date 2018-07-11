@@ -6,25 +6,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProductHandler {
+public class ProductService {
 
     final
     DatabaseHandler databaseHandler;
 
     @Autowired
-    public ProductHandler(DatabaseHandler databaseHandler) {
+    public ProductService(DatabaseHandler databaseHandler) {
         this.databaseHandler = databaseHandler;
     }
 
     public Product getDescriptionDebitCard(){
-        return databaseHandler.getProduct("debit-card");
+        return databaseHandler.getProductOfDataBase("debit-card");
     }
 
     public Product getDescriptionCreditCard(){
-        return databaseHandler.getProduct("credit-card");
+        return databaseHandler.getProductOfDataBase("credit-card");
     }
 
     public Product getDescriptionCreditCash(){
-        return databaseHandler.getProduct("credit-cash");
+        return databaseHandler.getProductOfDataBase("credit-cash");
     }
 }

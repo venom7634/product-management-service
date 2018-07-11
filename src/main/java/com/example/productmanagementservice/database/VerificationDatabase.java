@@ -21,7 +21,7 @@ public class VerificationDatabase {
     }
 
     public boolean checkingUser(String login, String password){
-        String query = "select * from clients where login = ?";
+        String query = "select * from users where login = ?";
 
         List<User> users = jdbcTemplate.query(query, new Object[] { login }, new UsersRowMapper());
 
@@ -32,7 +32,7 @@ public class VerificationDatabase {
     }
 
     public boolean verificationOnExistsApplication(String token, long id){
-        String query = "select * from clients where token = ?";
+        String query = "select * from users where token = ?";
 
         List<User> users = jdbcTemplate.query(query, new Object[] { token }, new UsersRowMapper());
 
@@ -46,7 +46,7 @@ public class VerificationDatabase {
     }
 
     public boolean authenticationOfBankEmployee(String token){
-        String query = "select * from clients where token = ?";
+        String query = "select * from users where token = ?";
 
         List<User> users = jdbcTemplate.query(query, new Object[] { token }, new UsersRowMapper());
 

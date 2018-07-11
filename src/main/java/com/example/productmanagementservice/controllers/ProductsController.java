@@ -1,7 +1,7 @@
 package com.example.productmanagementservice.controllers;
 
 import com.example.productmanagementservice.entity.products.Product;
-import com.example.productmanagementservice.services.ProductHandler;
+import com.example.productmanagementservice.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -11,26 +11,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductsController {
 
     final
-    ProductHandler productHandler;
+    ProductService productService;
 
     @Autowired
-    public ProductsController(ProductHandler productHandler) {
-        this.productHandler = productHandler;
+    public ProductsController(ProductService productService) {
+        this.productService = productService;
     }
 
     @RequestMapping(value = "/products/debit-card", method = RequestMethod.GET)
     public Product getDescriptionDebitCard(){
-        return productHandler.getDescriptionDebitCard();
+        return productService.getDescriptionDebitCard();
     }
 
     @RequestMapping(value = "/products/credit-card", method = RequestMethod.GET)
     public Product getDescriptionCreditCard(){
-        return productHandler.getDescriptionCreditCard();
+        return productService.getDescriptionCreditCard();
 
     }
 
     @RequestMapping(value = "/products/credit-cash", method = RequestMethod.GET)
     public Product getDescriptionCreditCash(){
-        return productHandler.getDescriptionCreditCash();
+        return productService.getDescriptionCreditCash();
     }
 }
