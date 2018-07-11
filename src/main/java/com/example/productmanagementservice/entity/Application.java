@@ -14,9 +14,9 @@ public class Application {
     private int client_id;
 
     private String product;
-    private Integer limit;
-    private Integer amount;
-    private Integer timeInMonth;
+    private String limit;
+    private String amount;
+    private String timeInMonth;
 
     public Application(){
     }
@@ -53,28 +53,28 @@ public class Application {
         this.product = product;
     }
 
-    public Integer getLimit() {
+    public String getLimit() {
         return limit;
     }
 
-    public void setLimit(Integer limit) {
+    public void setLimit(String limit) {
         this.limit = limit;
     }
 
 
-    public Integer getAmount() {
+    public String getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(String amount) {
         this.amount = amount;
     }
 
-    public Integer getTimeInMonth() {
+    public String getTimeInMonth() {
         return timeInMonth;
     }
 
-    public void setTimeInMonth(Integer timeInMonth) {
+    public void setTimeInMonth(String timeInMonth) {
         this.timeInMonth = timeInMonth;
     }
 }

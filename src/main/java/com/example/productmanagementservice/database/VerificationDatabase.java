@@ -27,7 +27,7 @@ public class VerificationDatabase {
         return false;
     }
 
-    public boolean verificatrionOnExistsApplication(String token, long id){
+    public boolean verificationOnExistsApplication(String token, long id){
         String query = "select * from clients where token = ?";
 
         List<Client> clients = jdbcTemplate.query(query, new Object[] { token }, new ClientsRowMapper());
@@ -36,8 +36,8 @@ public class VerificationDatabase {
             return false;
         }
 
-        query = "select * from applications where id = ?";
-        List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ClientsRowMapper());
+        query = "select * from applications where id = ? AND status = 0";
+        List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
         if(applications.isEmpty()){
             return false;
         }

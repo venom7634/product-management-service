@@ -1,4 +1,4 @@
-package com.example.productmanagementservice.entity;
+package com.example.productmanagementservice.entity.data;
 
 public class Token {
 

@@ -2,23 +2,26 @@ package com.example.productmanagementservice.database;
 
 import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.entity.Client;
-import com.example.productmanagementservice.entity.Token;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.crypto.MacProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.security.Key;
+import java.util.Date;
 import java.util.List;
 
 @Component
 public class DatabaseHandler {
 
+    private final JdbcTemplate jdbcTemplate;
+
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    public Token returnTokenForLogin(String login){
-        String query = "select token from clients where login = ?";
-
-        return new Token(jdbcTemplate.queryForObject(query, new Object[] { login }, String.class));
+    public DatabaseHandler(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public Application createNewApplication(String token){
@@ -41,29 +44,48 @@ public class DatabaseHandler {
                 result = app;
             }
         }
-
         return result;
     }
+
+    public String createToken(String login){
+        long time = new Date().getTime()/1000+1800;
+        Key key = MacProvider.generateKey();
+
+        String token = Jwts.builder()
+                .setSubject(login)
+                .signWith(SignatureAlgorithm.HS512, key).setExpiration(new Date(time))
+                .compact();
+
+        jdbcTemplate.update("UPDATE clients SET token = '" + token + "' WHERE login = '" + login + "'");
+
+        return token;
+    }
+
     public void sentApplicationToConfirmation(long id){
         jdbcTemplate.update("UPDATE applications SET status = '1' WHERE id = '" + id + "'");
     }
 
     public void addDebitCardToApplication(long idApplication){
-        jdbcTemplate.update("UPDATE applications SET product = 'debit-card' WHERE id ='" + idApplication + "'");
+        jdbcTemplate.update("UPDATE applications SET product = 'debit-card', " +
+                "limitOnCard = null, amount = null, timeInMonth = null WHERE id ='" + idApplication + "'");
     }
 
     public void addCreditCardToApplication(long idApplication, int limit){
-        jdbcTemplate.update("UPDATE applications SET product = 'credit-card', limitOnCard = '"
-                + limit + "' WHERE id ='" + idApplication + "'");
+        jdbcTemplate.update("UPDATE applications SET product = 'credit-card',amount = null, timeInMonth = null," +
+                " limitOnCard = '" + limit + "' WHERE id = " + idApplication);
+
+        String query = "select * from applications where id = ?";
+
+        List<Application> applications = jdbcTemplate.query(query, new Object[] { idApplication }, new ApplicationsRowMapper());
+        applications.get(0);
     }
 
     public void addCreditCashToApplication(long idApplication,int amount, int timeInMonth){
-
-
-        jdbcTemplate.update("UPDATE applications SET product = 'credit-cash', amount = '"
+        jdbcTemplate.update("UPDATE applications SET product = 'credit-cash',limitOnCard = null,  amount = '"
                 + amount + "', timeInMonth = '" + timeInMonth + "' WHERE id ='" + idApplication + "'");
     }
 
+    @PostConstruct
     public void createTables(){
         jdbcTemplate.execute("DROP TABLE IF EXISTS clients ");
         jdbcTemplate.execute("DROP TABLE IF EXISTS applications ");
@@ -71,7 +93,7 @@ public class DatabaseHandler {
                 "id  INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "login NCHAR(20) UNIQUE," +
                 "password NCHAR(20) NOT NULL," +
-                "token NCHAR(255) NOT NULL," +
+                "token NCHAR(255)," +
                 "security INTEGER NOT NULL,"+
                 "name NCHAR(20)  NOT NULL," +
                 "description NCHAR(100))");
@@ -87,9 +109,20 @@ public class DatabaseHandler {
                 "FOREIGN KEY(client_id) REFERENCES clients(id))");
 
         jdbcTemplate.update("INSERT INTO clients (login,password,token,security,name,description) " +
-                "VALUES ('katya','0502','AB830','0','Katya','student')");
+                "VALUES ('katya','0502','','0','Katya','student')");
         jdbcTemplate.update("INSERT INTO clients (login,password,token,security,name,description) " +
-                "VALUES ('viktor','1234','iamvitya031','1','Viktor','3 years experience')");
+                "VALUES ('viktor','1234','','1','Viktor','3 years experience')");
     }
 
+    public Application test(String token, long id){
+        String query = "select * from clients where token = ?";
+
+        List<Client> clients = jdbcTemplate.query(query, new Object[] { token }, new ClientsRowMapper());
+
+        query = "select * from applications where client_id = ? AND id = ?";
+
+        List<Application> applications = jdbcTemplate.query(query, new Object[] { clients.get(0).getId(),id }, new ApplicationsRowMapper());
+
+        return applications.get(0);
+    }
 }
