@@ -94,12 +94,15 @@ public class DatabaseHandler {
     public void approveApplication(long id){
 
         String query = "select * from applications where id = ?";
-        jdbcTemplate.update("UPDATE applications SET status = 2 WHERE id = ?", id);
+
 
         List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
+
         String product = applications.get(0).getProduct();
         jdbcTemplate.update("UPDATE applications SET status = 3, " +
                 "description = 'One user can have only one product of the same type' WHERE product = ?", product);
+
+        jdbcTemplate.update("UPDATE applications SET status = 2 WHERE id = ?", id);
     }
 
     public void negativeApplication(long id, String reason){

@@ -31,7 +31,7 @@ public class CreatorInDatabase {
         query = "select * from applications where client_id = ? AND status = ?";
 
         List<Application> applications = jdbcTemplate.query(query,
-                new Object[] { users.get(0).getId(),status }, new ApplicationsRowMapper());
+                new Object[] { users.get(0).getId(), status }, new ApplicationsRowMapper());
 
         for (Application app: applications){
             if(app.getId() > result.getId()){
@@ -45,6 +45,13 @@ public class CreatorInDatabase {
         jdbcTemplate.update("UPDATE users SET token = ? WHERE login = ?",token,login);
     }
 
+    public long getIdClientOfIdApplication(long idApplication){
+        String query = "select * from applications where id = ?";
+        List<Application> applications = jdbcTemplate.query(query, new Object[] { idApplication },
+                new ApplicationsRowMapper());
+
+        return applications.get(0).getId();
+    }
     @PostConstruct
     public void createTables(){
         jdbcTemplate.execute("DROP TABLE IF EXISTS users ");
@@ -77,7 +84,7 @@ public class CreatorInDatabase {
 
         jdbcTemplate.update("INSERT INTO users (login,password,token,security,name,description) " +
                 "VALUES ('katya','0502','','0','Katya','student'), " +
-                "('viktor','1234','','1','Viktor','3 years experience')");
+                "('victor','1234','','1','Victor','3 years experience')");
         jdbcTemplate.update("INSERT INTO products (name,description) VALUES ('debit-card','Regular client card')," +
                     "('credit-card','This card have something amount money that you can spend')," +
                 "('credit-cash','You are given the amount of money that you will return in a period of time')");

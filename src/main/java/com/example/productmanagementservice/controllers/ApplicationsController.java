@@ -21,7 +21,6 @@ public class ApplicationsController {
         this.applicationService = applicationService;
     }
 
-
     @RequestMapping(value = "/applications", method = RequestMethod.POST)
     public ResponseEntity<Application> createApplications(@RequestHeader("token") String token){
         return applicationService.createApplication(token);

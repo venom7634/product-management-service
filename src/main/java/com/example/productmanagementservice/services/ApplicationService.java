@@ -72,7 +72,7 @@ public class ApplicationService {
         } else if(verificationDatabase.verificationOnExistsApplication(token, id)){
             databaseHandler.addCreditCardToApplication(id,limit);
             responseEntity = new ResponseEntity<>(HttpStatus.OK);
-        } else if (limit < 0) {
+        } else if (limit < 0 && limit > 1000) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         else {
@@ -93,7 +93,7 @@ public class ApplicationService {
         } else if(verificationDatabase.verificationOnExistsApplication(token, id)){
             databaseHandler.addCreditCashToApplication(id,amount,timeInMonth);
             responseEntity = new ResponseEntity<>(HttpStatus.OK);
-        } else if (amount <= 0 || timeInMonth <= 0) {
+        } else if ((amount <= 0 && amount > 1000) || timeInMonth <= 0) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -111,7 +111,8 @@ public class ApplicationService {
                 verificationDatabase.checkProductInApplicationsClient(id) ||
                 !verificationDatabase.verificationOfBelongingApplicationToClient(id,token)){
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else if (verificationDatabase.checkIsEmptyOfApplication(id)){
+        } else if (verificationDatabase.checkIsEmptyOfApplication(id) ||
+                verificationDatabase.checkTotalAmountMoneyHasReachedMax(id)){
             responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else if(verificationDatabase.verificationOnExistsApplication(token, id)){
             databaseHandler.sendApplicationToConfirmation(id);
@@ -157,14 +158,17 @@ public class ApplicationService {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(!verificationDatabase.checkExistenceOfApplication(id)) {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else if(!loginService.checkTokenOnValidation(token) || verificationDatabase.checkProductInApplicationsClient(id)){
+        } else if(verificationDatabase.checkTotalAmountMoneyHasReachedMax(id)) {
+            responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }else if(!loginService.checkTokenOnValidation(token) || verificationDatabase.checkProductInApplicationsClient(id)){
                 responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
             } else if(verificationDatabase.authenticationOfBankEmployee(token)){
                 databaseHandler.approveApplication(id);
                 responseEntity = new ResponseEntity<>(HttpStatus.OK);
             } else {
-            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+                responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
         return responseEntity;
     }
 

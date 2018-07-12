@@ -69,6 +69,43 @@ public class VerificationDatabase {
         return !applications.isEmpty();
     }
 
+    public boolean checkTotalAmountMoneyHasReachedMax(long id){
+        int totalAmount = 0;
+        String query = "select users.id, login, password, token, security, users.name, users.description " +
+                "from users JOIN applications ON users.id = client_id where applications.id = ?";
+
+        List<User> users = jdbcTemplate.query(query,new Object[] { id }, new UsersRowMapper());
+
+        List<Application> test = jdbcTemplate.query("select * from applications",
+                new Object[] {}, new ApplicationsRowMapper());
+
+        query = "select * from applications where client_id = ? and status = 2";
+        List<Application> applications = jdbcTemplate.query(query, new Object[] { users.get(0).getId() }, new ApplicationsRowMapper());
+
+        for(Application app: applications){
+            if(app.getAmount() != null){
+                totalAmount+=Integer.parseInt(app.getAmount());
+            }
+            if(app.getLimit() != null){
+                totalAmount+=Integer.parseInt(app.getLimit());
+            }
+        }
+        query = "select * from applications where id = ?";
+        applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
+
+        if(applications.get(0).getLimit() != null){
+            if((Integer.parseInt(applications.get(0).getLimit())+totalAmount) <= 1000){
+                return false;
+            }
+        }
+
+        if(applications.get(0).getAmount() != null){
+            if((Integer.parseInt(applications.get(0).getAmount())+totalAmount) <= 1000){
+                return false;
+            }
+        }
+        return true;
+    }
     public boolean verificationOfBelongingApplicationToClient(long id, String token){
         String query = "select * from users where token = ?";
         List<User> users = jdbcTemplate.query(query,new Object[] { token }, new UsersRowMapper());
