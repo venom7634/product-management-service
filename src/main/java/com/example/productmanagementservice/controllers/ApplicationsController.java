@@ -71,7 +71,7 @@ public class ApplicationsController {
     }
 
     @RequestMapping(value = "/applications/{id}/negative", method = RequestMethod.POST)
-    public ResponseEntity<String> negativeApplication(@PathVariable long idApplication,
+    public ResponseEntity<String> negativeApplication(@PathVariable("id") long idApplication,
                                                       @RequestHeader("token") String token,
                                                       @RequestBody Reason reason) {
         return applicationService.negativeApplication(idApplication, token, reason.getReason());
