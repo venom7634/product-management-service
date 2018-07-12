@@ -59,12 +59,48 @@ public class VerificationDatabase {
     public boolean checkProductInApplicationsClient(long id){
         String query = "select * from applications where id = ?";
 
-        List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
+        List<Application> applications = jdbcTemplate.query(query,
+                new Object[] { id }, new ApplicationsRowMapper());
 
         query = "select * from applications where product = ? and id = ? and status = 2";
-
-        applications = jdbcTemplate.query(query,new Object[] {applications.get(0).getProduct(),id }, new ApplicationsRowMapper());
+        applications = jdbcTemplate.query(query,new Object[] { applications.get(0).getProduct(), id },
+                new ApplicationsRowMapper());
 
         return !applications.isEmpty();
+    }
+
+    public boolean verificationOfBelongingApplicationToClient(long id, String token){
+        String query = "select * from users where token = ?";
+        List<User> users = jdbcTemplate.query(query,new Object[] { token }, new UsersRowMapper());
+
+        query = "select * from applications where id = ? and client_id = ?";
+        List<Application> applications = jdbcTemplate.query(query,
+                new Object[] { id, users.get(0).getId()}, new ApplicationsRowMapper());
+
+        return !applications.isEmpty();
+    }
+
+    public boolean checkExistenceOfApplication(long id){
+        String query = "select * from applications where id = ?";
+
+        List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
+
+        return !applications.isEmpty();
+    }
+
+    public boolean checkIsEmptyOfApplication(long id){
+        String query = "select * from applications where id = ?";
+        List<Application> applications = jdbcTemplate.query(query,
+                new Object[] { id }, new ApplicationsRowMapper());
+
+        return applications.get(0).getProduct() == null;
+    }
+
+    public boolean checkTokenInDatabase(String token){
+        String query = "select * from users where token = ?";
+        List<User> users = jdbcTemplate.query(query,
+                new Object[] { token }, new UsersRowMapper());
+
+        return !users.isEmpty();
     }
 }

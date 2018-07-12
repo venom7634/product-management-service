@@ -41,7 +41,9 @@ public class ProductService {
     public ResponseEntity<List<Product>> getProductsForClient(String token, long id){
         ResponseEntity<List<Product>>responseEntity;
 
-        if(!loginService.checkTokenOnValidation(token)){
+        if (!verificationDatabase.checkTokenInDatabase(token)) {
+            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } else if(!loginService.checkTokenOnValidation(token)){
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(verificationDatabase.authenticationOfBankEmployee(token)){
             responseEntity = new ResponseEntity<>(databaseHandler.getProductsForClient(id),HttpStatus.OK);

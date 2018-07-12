@@ -33,7 +33,9 @@ public class ApplicationService {
 
     public ResponseEntity<Application> createApplication(String token){
         ResponseEntity<Application> responseEntity;
-        if(!loginService.checkTokenOnValidation(token)){
+        if (!verificationDatabase.checkTokenInDatabase(token)) {
+            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } else if(!loginService.checkTokenOnValidation(token)){
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else {
             responseEntity = new ResponseEntity<>(creatorInDatabase.createNewApplication(token),HttpStatus.OK);
@@ -44,7 +46,10 @@ public class ApplicationService {
     public ResponseEntity<String> addDebitCardToApplication(String token, long id) {
         ResponseEntity<String> responseEntity;
 
-        if(!loginService.checkTokenOnValidation(token)){
+        if (!verificationDatabase.checkTokenInDatabase(token)) {
+            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } else if(!loginService.checkTokenOnValidation(token) ||
+                !verificationDatabase.verificationOfBelongingApplicationToClient(id, token)){
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(verificationDatabase.verificationOnExistsApplication(token, id)){
             databaseHandler.addDebitCardToApplication(id);
@@ -59,7 +64,10 @@ public class ApplicationService {
     public ResponseEntity<String> addCreditCardToApplication(String token, long id, int limit) {
         ResponseEntity<String> responseEntity;
 
-        if(!loginService.checkTokenOnValidation(token)){
+        if (!verificationDatabase.checkTokenInDatabase(token)) {
+            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } else if(!loginService.checkTokenOnValidation(token)||
+                !verificationDatabase.verificationOfBelongingApplicationToClient(id, token)){
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(verificationDatabase.verificationOnExistsApplication(token, id)){
             databaseHandler.addCreditCardToApplication(id,limit);
@@ -77,7 +85,10 @@ public class ApplicationService {
     public ResponseEntity<String> addCreditCashToApplication(String token, long id, int amount, int timeInMonth) {
         ResponseEntity<String> responseEntity;
 
-        if(!loginService.checkTokenOnValidation(token)){
+        if (!verificationDatabase.checkTokenInDatabase(token)) {
+            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } else if(!loginService.checkTokenOnValidation(token)||
+                !verificationDatabase.verificationOfBelongingApplicationToClient(id, token)){
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(verificationDatabase.verificationOnExistsApplication(token, id)){
             databaseHandler.addCreditCashToApplication(id,amount,timeInMonth);
@@ -94,8 +105,14 @@ public class ApplicationService {
     public ResponseEntity<String> sendApplicationForApproval(String token, long id){
         ResponseEntity<String> responseEntity;
 
-        if(!loginService.checkTokenOnValidation(token) || verificationDatabase.checkProductInApplicationsClient(id)){
+        if(!verificationDatabase.checkExistenceOfApplication(id)) {
+            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else if(!loginService.checkTokenOnValidation(token) ||
+                verificationDatabase.checkProductInApplicationsClient(id) ||
+                !verificationDatabase.verificationOfBelongingApplicationToClient(id,token)){
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } else if (verificationDatabase.checkIsEmptyOfApplication(id)){
+            responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else if(verificationDatabase.verificationOnExistsApplication(token, id)){
             databaseHandler.sendApplicationToConfirmation(id);
             responseEntity = new ResponseEntity<>(HttpStatus.OK);
@@ -108,11 +125,13 @@ public class ApplicationService {
     public ResponseEntity<List<Application>> getApplicationsForApproval(String token){
         ResponseEntity<List<Application>> responseEntity;
 
-        if(!loginService.checkTokenOnValidation(token)){
+        if (!verificationDatabase.checkTokenInDatabase(token)) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else{
-            responseEntity = new ResponseEntity<>(databaseHandler.getListApplicationsOfDataBase(token),HttpStatus.OK);
-        }
+        } else if(!loginService.checkTokenOnValidation(token)){
+                responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            } else{
+                responseEntity = new ResponseEntity<>(databaseHandler.getListApplicationsOfDataBase(token),HttpStatus.OK);
+            }
 
         return responseEntity;
     }
@@ -133,12 +152,16 @@ public class ApplicationService {
     public ResponseEntity<String> approveApplication(long id, String token){
         ResponseEntity<String> responseEntity;
 
-        if(!loginService.checkTokenOnValidation(token) || verificationDatabase.checkProductInApplicationsClient(id)){
+        if (!verificationDatabase.checkTokenInDatabase(token)) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else if(verificationDatabase.authenticationOfBankEmployee(token)){
-            databaseHandler.approveApplication(id);
-            responseEntity = new ResponseEntity<>(HttpStatus.OK);
-        } else {
+        } else if(!verificationDatabase.checkExistenceOfApplication(id)) {
+            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else if(!loginService.checkTokenOnValidation(token) || verificationDatabase.checkProductInApplicationsClient(id)){
+                responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            } else if(verificationDatabase.authenticationOfBankEmployee(token)){
+                databaseHandler.approveApplication(id);
+                responseEntity = new ResponseEntity<>(HttpStatus.OK);
+            } else {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return responseEntity;
@@ -147,7 +170,11 @@ public class ApplicationService {
     public ResponseEntity<String> negativeApplication(long id, String token, String reason){
         ResponseEntity<String> responseEntity;
 
-        if(!loginService.checkTokenOnValidation(token)){
+        if (!verificationDatabase.checkTokenInDatabase(token)) {
+            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } else if(!verificationDatabase.checkExistenceOfApplication(id)) {
+            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else if(!loginService.checkTokenOnValidation(token)){
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(verificationDatabase.authenticationOfBankEmployee(token)){
             databaseHandler.negativeApplication(id,reason);
