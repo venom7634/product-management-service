@@ -13,7 +13,7 @@ public class Product {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String name;
 
-    public Product(){
+    public Product() {
 
     }
 
@@ -39,11 +39,11 @@ public class Product {
         this.id = id;
     }
 
-    public void setDescription(String description){
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    public String getDescription(){
+    public String getDescription() {
         return this.description;
     }
 }

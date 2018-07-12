@@ -21,7 +21,7 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<Token> signUp(@RequestBody Account account){
-        return loginHandler.login(account.getLogin(),account.getPassword());
+    public ResponseEntity<Token> signUp(@RequestBody Account account) {
+        return loginHandler.login(account.getLogin(), account.getPassword());
     }
 }

@@ -21,22 +21,22 @@ public class ProductsController {
     }
 
     @RequestMapping(value = "/products/debit-card", method = RequestMethod.GET)
-    public Product getDescriptionDebitCard(){
+    public Product getDescriptionDebitCard() {
         return productService.getDescriptionDebitCard();
     }
 
     @RequestMapping(value = "/products/credit-card", method = RequestMethod.GET)
-    public Product getDescriptionCreditCard(){
+    public Product getDescriptionCreditCard() {
         return productService.getDescriptionCreditCard();
     }
 
     @RequestMapping(value = "/products/credit-cash", method = RequestMethod.GET)
-    public Product getDescriptionCreditCash(){
+    public Product getDescriptionCreditCash() {
         return productService.getDescriptionCreditCash();
     }
 
     @RequestMapping(value = "/clients/{id}/products", method = RequestMethod.GET)
-    public ResponseEntity<List<Product>> getClientProducts(@PathVariable long id, @RequestHeader("token") String token){
-        return productService.getProductsForClient(token,id);
+    public ResponseEntity<List<Product>> getClientProducts(@PathVariable long userId, @RequestHeader("token") String token) {
+        return productService.getProductsForClient(token, userId);
     }
 }

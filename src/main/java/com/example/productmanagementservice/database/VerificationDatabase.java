@@ -20,132 +20,141 @@ public class VerificationDatabase {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public boolean checkingUser(String login, String password){
+    public boolean checkingUser(String login, String password) {
         String query = "select * from users where login = ?";
 
-        List<User> users = jdbcTemplate.query(query, new Object[] { login }, new UsersRowMapper());
+        List<User> users = jdbcTemplate.query(query, new Object[]{login}, new UsersRowMapper());
 
-        if(!users.isEmpty()){
+        if (!users.isEmpty()) {
             return users.get(0).getPassword().equals(password);
         }
         return false;
     }
 
-    public boolean verificationOnExistsApplication(String token, long id){
-        String query = "select * from users where token = ?";
-
-        List<User> users = jdbcTemplate.query(query, new Object[] { token }, new UsersRowMapper());
-
-        if(users.isEmpty()){
-            return false;
-        }
-
-        query = "select * from applications where id = ? AND status = 0";
-        List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
-        return !applications.isEmpty();
+    public boolean verificationOnExistsApplication(long idApplication) {
+        Application application = getApplicationOfIdAndStatus(idApplication, 0);
+        return !(application == null);
     }
 
-    public boolean authenticationOfBankEmployee(String token){
-        String query = "select * from users where token = ?";
-
-        List<User> users = jdbcTemplate.query(query, new Object[] { token }, new UsersRowMapper());
-
-        if(!users.isEmpty()){
-            return users.get(0).getSecurity_id() == 0;
-        }
-        return false;
+    public boolean authenticationOfBankEmployee(String token) {
+        User user = getUserOfToken(token);
+        return user.getSecurity_id() == 0;
     }
 
-    public boolean checkProductInApplicationsClient(long id){
-        String query = "select * from applications where id = ?";
+    public boolean checkProductInApplicationsClient(long idApplication) {
+        Application application = getApplicationOfId(idApplication);
 
-        List<Application> applications = jdbcTemplate.query(query,
-                new Object[] { id }, new ApplicationsRowMapper());
-
-        query = "select * from applications where product = ? and id = ? and status = 2";
-        applications = jdbcTemplate.query(query,new Object[] { applications.get(0).getProduct(), id },
+        String query = "select * from applications where product = ? and id = ? and status = 2";
+        List<Application> applications = jdbcTemplate.query(query, new Object[]{application.getProduct(), idApplication},
                 new ApplicationsRowMapper());
 
         return !applications.isEmpty();
     }
 
-    public boolean checkTotalAmountMoneyHasReachedMax(long id){
+    public boolean verificationOfBelongingApplicationToClient(long idApplication, String token) {
+        User user = getUserOfToken(token);
+
+        String query = "select * from applications where id = ? and client_id = ?";
+        List<Application> applications = jdbcTemplate.query(query,
+                new Object[]{idApplication, user.getId()}, new ApplicationsRowMapper());
+
+        return !applications.isEmpty();
+    }
+
+    public boolean checkExistenceOfApplication(long idApplication) {
+        Application application = getApplicationOfId(idApplication);
+        return !(application == null);
+    }
+
+    public boolean checkForChangeStatusApplication(long idApplication) {
+        Application application = getApplicationOfIdAndStatus(idApplication, 1);
+        return !(application == null);
+    }
+
+    public boolean checkIsEmptyOfApplication(long idApplication) {
+        Application application = getApplicationOfId(idApplication);
+        String product = application.getProduct();
+        return (product == null);
+    }
+
+    public boolean checkTokenInDatabase(String token) {
+        User user = getUserOfToken(token);
+        return !(user == null);
+    }
+
+    public boolean checkTotalAmountMoneyHasReachedMax(long idApplication) {
         int totalAmount = 0;
         String query = "select users.id, login, password, token, security, users.name, users.description " +
                 "from users JOIN applications ON users.id = client_id where applications.id = ?";
 
-        List<User> users = jdbcTemplate.query(query,new Object[] { id }, new UsersRowMapper());
-
-        List<Application> test = jdbcTemplate.query("select * from applications",
-                new Object[] {}, new ApplicationsRowMapper());
+        List<User> users = jdbcTemplate.query(query, new Object[]{idApplication}, new UsersRowMapper());
 
         query = "select * from applications where client_id = ? and status = 2";
-        List<Application> applications = jdbcTemplate.query(query, new Object[] { users.get(0).getId() }, new ApplicationsRowMapper());
+        List<Application> applications = jdbcTemplate.query(query, new Object[]{users.get(0).getId()}, new ApplicationsRowMapper());
 
-        for(Application app: applications){
-            if(app.getAmount() != null){
-                totalAmount+=Integer.parseInt(app.getAmount());
+        for (Application app : applications) {
+            if (app.getAmount() != null) {
+                totalAmount += Integer.parseInt(app.getAmount());
             }
-            if(app.getLimit() != null){
-                totalAmount+=Integer.parseInt(app.getLimit());
+            if (app.getLimit() != null) {
+                totalAmount += Integer.parseInt(app.getLimit());
             }
         }
-        query = "select * from applications where id = ?";
-        applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
 
-        if(applications.get(0).getLimit() != null){
-            if((Integer.parseInt(applications.get(0).getLimit())+totalAmount) <= 1000){
+        Application application = getApplicationOfId(idApplication);
+
+        if (application.getLimit() != null) {
+            if ((Integer.parseInt(application.getLimit()) + totalAmount) <= 1000) {
+                return false;
+            }
+        }
+        if (application.getAmount() != null) {
+            if ((Integer.parseInt(application.getAmount()) + totalAmount) <= 1000) {
                 return false;
             }
         }
 
-        if(applications.get(0).getAmount() != null){
-            if((Integer.parseInt(applications.get(0).getAmount())+totalAmount) <= 1000){
-                return false;
-            }
+        if (application.getAmount() == null && application.getLimit() == null) {
+            return false;
         }
         return true;
     }
-    public boolean verificationOfBelongingApplicationToClient(long id, String token){
+
+    public User getUserOfToken(String token) {
         String query = "select * from users where token = ?";
-        List<User> users = jdbcTemplate.query(query,new Object[] { token }, new UsersRowMapper());
 
-        query = "select * from applications where id = ? and client_id = ?";
-        List<Application> applications = jdbcTemplate.query(query,
-                new Object[] { id, users.get(0).getId()}, new ApplicationsRowMapper());
+        List<User> users = jdbcTemplate.query(query, new Object[]{token}, new UsersRowMapper());
 
-        return !applications.isEmpty();
+        if (users.isEmpty()) {
+            return null;
+        }
+
+        return users.get(0);
     }
 
-    public boolean checkExistenceOfApplication(long id){
+    public Application getApplicationOfId(long idApplication) {
         String query = "select * from applications where id = ?";
 
-        List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
+        List<Application> applications = jdbcTemplate.query(query, new Object[]{idApplication},
+                new ApplicationsRowMapper());
 
-        return !applications.isEmpty();
+        if (applications.isEmpty()) {
+            return null;
+        }
+
+        return applications.get(0);
     }
 
-    public boolean checkForChangeStatusApplication(long id){
-        String query = "select * from applications where id = ? and status = 1";
+    public Application getApplicationOfIdAndStatus(long idApplication, int status) {
+        String query = "select * from applications where id = ? and status = ?";
 
-        List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
+        List<Application> applications = jdbcTemplate.query(query, new Object[]{idApplication, status},
+                new ApplicationsRowMapper());
 
-        return !applications.isEmpty();
-    }
+        if (applications.isEmpty()) {
+            return null;
+        }
 
-    public boolean checkIsEmptyOfApplication(long id){
-        String query = "select * from applications where id = ?";
-        List<Application> applications = jdbcTemplate.query(query,
-                new Object[] { id }, new ApplicationsRowMapper());
-
-        return applications.get(0).getProduct() == null;
-    }
-
-    public boolean checkTokenInDatabase(String token){
-        String query = "select * from users where token = ?";
-        List<User> users = jdbcTemplate.query(query,
-                new Object[] { token }, new UsersRowMapper());
-
-        return !users.isEmpty();
+        return applications.get(0);
     }
 }

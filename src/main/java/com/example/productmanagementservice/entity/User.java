@@ -10,7 +10,7 @@ public class User {
     String name;
     String description;
 
-    public User(){
+    public User() {
 
     }
 

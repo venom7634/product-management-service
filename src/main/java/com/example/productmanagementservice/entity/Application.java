@@ -20,7 +20,7 @@ public class Application {
 
     private String description;
 
-    public Application(){
+    public Application() {
     }
 
     public String getDescription() {

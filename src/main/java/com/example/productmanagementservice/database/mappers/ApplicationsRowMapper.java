@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-    public class ApplicationsRowMapper implements  RowMapper{
+public class ApplicationsRowMapper implements RowMapper {
 
     public Application mapRow(ResultSet resultSet, int i) throws SQLException {
         String[] columns = {"product", "limitOnCard", "timeInMonth", "amount", "description"};
@@ -20,26 +20,26 @@ import java.sql.SQLException;
         app.setClient_id(resultSet.getInt("client_id"));
 
 
-        for(String element: columns){
+        for (String element : columns) {
             for (int x = 1; x <= resultSetMetaData.getColumnCount(); x++) {
                 if (element.equals(resultSetMetaData.getColumnName(x))) {
-                  switch (element){
-                      case "product":
-                          app.setProduct(resultSet.getString("product"));
-                          break;
-                      case "limitOnCard":
-                          app.setLimit(resultSet.getString("limitOnCard"));
-                          break;
-                      case "timeInMonth":
-                          app.setTimeInMonth(resultSet.getString("timeInMonth"));
-                          break;
-                      case "amount":
-                          app.setAmount(resultSet.getString("amount"));
-                          break;
-                      case "description":
-                          app.setDescription(resultSet.getString("description"));
-                          break;
-                  }
+                    switch (element) {
+                        case "product":
+                            app.setProduct(resultSet.getString("product"));
+                            break;
+                        case "limitOnCard":
+                            app.setLimit(resultSet.getString("limitOnCard"));
+                            break;
+                        case "timeInMonth":
+                            app.setTimeInMonth(resultSet.getString("timeInMonth"));
+                            break;
+                        case "amount":
+                            app.setAmount(resultSet.getString("amount"));
+                            break;
+                        case "description":
+                            app.setDescription(resultSet.getString("description"));
+                            break;
+                    }
                 }
             }
         }

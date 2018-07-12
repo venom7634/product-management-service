@@ -22,53 +22,59 @@ public class ApplicationsController {
     }
 
     @RequestMapping(value = "/applications", method = RequestMethod.POST)
-    public ResponseEntity<Application> createApplications(@RequestHeader("token") String token){
+    public ResponseEntity<Application> createApplications(@RequestHeader("token") String token) {
         return applicationService.createApplication(token);
     }
 
     @RequestMapping(value = "/applications/{id}/debit-card", method = RequestMethod.POST)
-    public ResponseEntity<String> addDebitCard(@PathVariable("id") long id, @RequestHeader("token") String token){
-        return applicationService.addDebitCardToApplication(token,id);
+    public ResponseEntity<String> addDebitCard(@PathVariable("id") long idApplication,
+                                               @RequestHeader("token") String token) {
+        return applicationService.addDebitCardToApplication(token, idApplication);
     }
 
     @RequestMapping(value = "/applications/{id}/credit-card", method = RequestMethod.POST)
-    public ResponseEntity<String> addCreditCard(@PathVariable("id") long id, @RequestHeader("token") String token,
-                                                @RequestBody CreditCard creditCard){
-        return applicationService.addCreditCardToApplication(token,id,creditCard.getLimit());
+    public ResponseEntity<String> addCreditCard(@PathVariable("id") long idApplication,
+                                                @RequestHeader("token") String token,
+                                                @RequestBody CreditCard creditCard) {
+        return applicationService.addCreditCardToApplication(token, idApplication, creditCard.getLimit());
     }
 
     @RequestMapping(value = "/applications/{id}/credit-cash", method = RequestMethod.POST)
-    public ResponseEntity<String> addCreditCard(@PathVariable("id") long id, @RequestHeader("token") String token,
-                                                @RequestBody CreditCash creditCash){
-        return applicationService.addCreditCashToApplication(token, id, creditCash.getAmount(),
+    public ResponseEntity<String> addCreditCard(@PathVariable("id") long idApplication,
+                                                @RequestHeader("token") String token,
+                                                @RequestBody CreditCash creditCash) {
+        return applicationService.addCreditCashToApplication(token, idApplication, creditCash.getAmount(),
                 creditCash.getTimeInMonth());
     }
 
     @RequestMapping(value = "/applications/{id}", method = RequestMethod.POST)
-    public ResponseEntity<String> sentApplication(@PathVariable("id") long id, @RequestHeader("token") String token){
-        return applicationService.sendApplicationForApproval(token,id);
+    public ResponseEntity<String> sentApplication(@PathVariable("id") long idApplication,
+                                                  @RequestHeader("token") String token) {
+        return applicationService.sendApplicationForApproval(token, idApplication);
     }
 
     @RequestMapping(value = "/applications", method = RequestMethod.GET)
-    public ResponseEntity<List<Application>> getListApplicationsClientForApproval(@RequestParam("userId") long id,
-                                                                  @RequestHeader("token") String token){
-        return applicationService.getApplicationsClientForApproval(id,token);
+    public ResponseEntity<List<Application>> getListApplicationsClientForApproval(@RequestParam("userId") long userId,
+                                                                                  @RequestHeader("token") String token) {
+        return applicationService.getApplicationsClientForApproval(userId, token);
     }
 
     @RequestMapping(value = "/applications/my", method = RequestMethod.GET)
-    public ResponseEntity<List<Application>> getMyListApplicationsForApproval(@RequestHeader("token") String token){
+    public ResponseEntity<List<Application>> getMyListApplicationsForApproval(@RequestHeader("token") String token) {
         return applicationService.getApplicationsForApproval(token);
     }
 
     @RequestMapping(value = "/applications/{id}/approve", method = RequestMethod.POST)
-    public ResponseEntity<String> approveApplication(@PathVariable long id, @RequestHeader("token") String token){
-        return applicationService.approveApplication(id, token);
+    public ResponseEntity<String> approveApplication(@PathVariable("id") long idApplication,
+                                                     @RequestHeader("token") String token) {
+        return applicationService.approveApplication(idApplication, token);
     }
 
     @RequestMapping(value = "/applications/{id}/negative", method = RequestMethod.POST)
-    public ResponseEntity<String> negativeApplication(@PathVariable long id, @RequestHeader("token") String token,
-                                                      @RequestBody Reason reason){
-        return applicationService.negativeApplication(id,token,reason.getReason());
+    public ResponseEntity<String> negativeApplication(@PathVariable long idApplication,
+                                                      @RequestHeader("token") String token,
+                                                      @RequestBody Reason reason) {
+        return applicationService.negativeApplication(idApplication, token, reason.getReason());
     }
 
 }

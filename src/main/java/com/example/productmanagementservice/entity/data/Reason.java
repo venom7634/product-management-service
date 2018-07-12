@@ -8,7 +8,7 @@ public class Reason {
         this.reason = reason;
     }
 
-    public Reason(){
+    public Reason() {
 
     }
 

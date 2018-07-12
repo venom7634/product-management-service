@@ -1,10 +1,10 @@
 package com.example.productmanagementservice.entity.products;
 
-public class CreditCard extends Product{
+public class CreditCard extends Product {
 
     int limit;
 
-    public CreditCard(){
+    public CreditCard() {
 
     }
 

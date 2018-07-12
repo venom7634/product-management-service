@@ -18,6 +18,7 @@ public class ProductService {
     private final LoginService loginService;
 
     private final VerificationDatabase verificationDatabase;
+
     @Autowired
     public ProductService(DatabaseHandler databaseHandler, LoginService loginService,
                           VerificationDatabase verificationDatabase) {
@@ -26,27 +27,27 @@ public class ProductService {
         this.verificationDatabase = verificationDatabase;
     }
 
-    public Product getDescriptionDebitCard(){
+    public Product getDescriptionDebitCard() {
         return databaseHandler.getProductOfDataBase("debit-card");
     }
 
-    public Product getDescriptionCreditCard(){
+    public Product getDescriptionCreditCard() {
         return databaseHandler.getProductOfDataBase("credit-card");
     }
 
-    public Product getDescriptionCreditCash(){
+    public Product getDescriptionCreditCash() {
         return databaseHandler.getProductOfDataBase("credit-cash");
     }
 
-    public ResponseEntity<List<Product>> getProductsForClient(String token, long id){
-        ResponseEntity<List<Product>>responseEntity;
+    public ResponseEntity<List<Product>> getProductsForClient(String token, long userId) {
+        ResponseEntity<List<Product>> responseEntity;
 
         if (!verificationDatabase.checkTokenInDatabase(token)) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else if(!loginService.checkTokenOnValidation(token)){
+        } else if (!loginService.checkTokenOnValidation(token)) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else if(verificationDatabase.authenticationOfBankEmployee(token)){
-            responseEntity = new ResponseEntity<>(databaseHandler.getProductsForClient(id),HttpStatus.OK);
+        } else if (verificationDatabase.authenticationOfBankEmployee(token)) {
+            responseEntity = new ResponseEntity<>(databaseHandler.getProductsForClient(userId), HttpStatus.OK);
         } else {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

@@ -17,43 +17,36 @@ public class CreatorInDatabase {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public Application createNewApplication(String token){
+    public Application createNewApplication(String token) {
         String query = "select * from users where token = ?";
-        int status = 0;
         Application result = new Application();
-        result.setId(-1);
+        result.setId(0);
+        int status = 0;
 
-        List<User> users = jdbcTemplate.query(query, new Object[] { token }, new UsersRowMapper());
+        List<User> users = jdbcTemplate.query(query, new Object[]{token}, new UsersRowMapper());
 
-        jdbcTemplate.update("INSERT INTO applications (client_id,status) " +
-                "VALUES (?,0)",users.get(0).getId());
+        jdbcTemplate.update("INSERT INTO applications (client_id, status) " +
+                "VALUES (?,0)", users.get(0).getId());
 
         query = "select * from applications where client_id = ? AND status = ?";
 
         List<Application> applications = jdbcTemplate.query(query,
-                new Object[] { users.get(0).getId(), status }, new ApplicationsRowMapper());
+                new Object[]{users.get(0).getId(), status}, new ApplicationsRowMapper());
 
-        for (Application app: applications){
-            if(app.getId() > result.getId()){
+        for (Application app : applications) {
+            if (app.getId() > result.getId()) {
                 result = app;
             }
         }
         return result;
     }
 
-    public void addTokenInDatabase(String token, String login){
-        jdbcTemplate.update("UPDATE users SET token = ? WHERE login = ?",token,login);
+    public void addTokenInDatabase(String token, String login) {
+        jdbcTemplate.update("UPDATE users SET token = ? WHERE login = ?", token, login);
     }
 
-    public long getIdClientOfIdApplication(long idApplication){
-        String query = "select * from applications where id = ?";
-        List<Application> applications = jdbcTemplate.query(query, new Object[] { idApplication },
-                new ApplicationsRowMapper());
-
-        return applications.get(0).getId();
-    }
     @PostConstruct
-    public void createTables(){
+    public void createTables() {
         jdbcTemplate.execute("DROP TABLE IF EXISTS users ");
         jdbcTemplate.execute("DROP TABLE IF EXISTS applications ");
         jdbcTemplate.execute("DROP TABLE IF EXISTS products ");
@@ -62,7 +55,7 @@ public class CreatorInDatabase {
                 "login NCHAR(20) UNIQUE," +
                 "password NCHAR(20) NOT NULL," +
                 "token NCHAR(255)," +
-                "security INTEGER NOT NULL,"+
+                "security INTEGER NOT NULL," +
                 "name NCHAR(20)  NOT NULL," +
                 "description NCHAR(100))");
 
@@ -72,7 +65,7 @@ public class CreatorInDatabase {
                 "status INTEGER NOT NULL," +
                 "product NCHAR(20)," +
                 "limitOnCard INTEGER," +
-                "amount INTEGER,"+
+                "amount INTEGER," +
                 "timeInMonth INTEGER," +
                 "description NCHAR(300)," +
                 "FOREIGN KEY(client_id) REFERENCES users(id))");
@@ -82,11 +75,11 @@ public class CreatorInDatabase {
                 "name NCHAR(30) NOT NULL," +
                 "description NCHAR(255) NOT NULL)");
 
-        jdbcTemplate.update("INSERT INTO users (login,password,token,security,name,description) " +
-                "VALUES ('katya','0502','','0','Katya','student'), " +
-                "('victor','1234','','1','Victor','3 years experience')");
-        jdbcTemplate.update("INSERT INTO products (name,description) VALUES ('debit-card','Regular client card')," +
-                    "('credit-card','This card have something amount money that you can spend')," +
-                "('credit-cash','You are given the amount of money that you will return in a period of time')");
+        jdbcTemplate.update("INSERT INTO users (login, password, token, security, name, description) " +
+                "VALUES ('katya', '0502', '', '0', 'Katya', 'student'), " +
+                "('victor', '1234', '', '1', 'Victor', '3 years experience')");
+        jdbcTemplate.update("INSERT INTO products (name, description) VALUES ('debit-card', 'Regular client card')," +
+                "('credit-card', 'This card have something amount money that you can spend')," +
+                "('credit-cash', 'You are given the amount of money that you will return in a period of time')");
     }
 }

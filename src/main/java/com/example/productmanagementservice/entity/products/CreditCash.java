@@ -10,9 +10,10 @@ public class CreditCash extends Product {
         this.amount = amount;
     }
 
-    public CreditCash(){
+    public CreditCash() {
 
     }
+
     public int getTimeInMonth() {
         return timeInMonth;
     }
