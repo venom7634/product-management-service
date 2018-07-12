@@ -88,6 +88,14 @@ public class VerificationDatabase {
         return !applications.isEmpty();
     }
 
+    public boolean checkForChangeStatusApplication(long id){
+        String query = "select * from applications where id = ? and status = 1";
+
+        List<Application> applications = jdbcTemplate.query(query, new Object[] { id }, new ApplicationsRowMapper());
+
+        return !applications.isEmpty();
+    }
+
     public boolean checkIsEmptyOfApplication(long id){
         String query = "select * from applications where id = ?";
         List<Application> applications = jdbcTemplate.query(query,

@@ -152,7 +152,8 @@ public class ApplicationService {
     public ResponseEntity<String> approveApplication(long id, String token){
         ResponseEntity<String> responseEntity;
 
-        if (!verificationDatabase.checkTokenInDatabase(token)) {
+        if (!verificationDatabase.checkTokenInDatabase(token) ||
+                !verificationDatabase.checkForChangeStatusApplication(id)) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(!verificationDatabase.checkExistenceOfApplication(id)) {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -170,7 +171,8 @@ public class ApplicationService {
     public ResponseEntity<String> negativeApplication(long id, String token, String reason){
         ResponseEntity<String> responseEntity;
 
-        if (!verificationDatabase.checkTokenInDatabase(token)) {
+        if (!verificationDatabase.checkTokenInDatabase(token) ||
+                !verificationDatabase.checkForChangeStatusApplication(id)) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(!verificationDatabase.checkExistenceOfApplication(id)) {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
