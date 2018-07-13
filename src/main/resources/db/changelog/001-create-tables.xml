@@ -1,0 +1,101 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+   http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="1" author="m.ryazanov">
+        <createTable tableName="users">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="login" type="varchar(20)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="token" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="security" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(100)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="applications">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="client_id" type="int">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="status" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product" type="varchar(20)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="limitOnCard" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="amount" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="timeInMonth" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="description" type="nchar(300)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="client_id"
+                                 baseTableName="applications"
+                                 constraintName="fk_app_users"
+                                 referencedColumnNames="id"
+                                 referencedTableName="users"/>
+
+        <createTable tableName="products">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(30)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+
+</databaseChangeLog>
+
+
+
+
+        <!--jdbcTemplate.execute("CREATE TABLE applications(" +-->
+        <!--"id  INTEGER PRIMARY KEY AUTOINCREMENT," +-->
+        <!--"client_id INTEGER NOT NULL," +-->
+        <!--"status INTEGER NOT NULL," +-->
+        <!--"product NCHAR(20)," +-->
+        <!--"limitOnCard INTEGER," +-->
+        <!--"amount INTEGER," +-->
+        <!--"timeInMonth INTEGER," +-->
+        <!--"description NCHAR(300)," +-->
+        <!--"FOREIGN KEY(client_id) REFERENCES users(id))");-->
+
+        <!--jdbcTemplate.execute("CREATE TABLE products(" +-->
+        <!--"id  INTEGER PRIMARY KEY AUTOINCREMENT," +-->
+        <!--"name NCHAR(30) NOT NULL," +-->
+        <!--"description NCHAR(255) NOT NULL)");-->

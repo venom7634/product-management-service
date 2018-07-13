@@ -1,6 +1,5 @@
 package com.example.productmanagementservice.controllers;
 
-import com.example.productmanagementservice.entity.data.Reason;
 import com.example.productmanagementservice.entity.products.Product;
 import com.example.productmanagementservice.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;

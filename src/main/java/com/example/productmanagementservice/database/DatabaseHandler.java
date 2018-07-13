@@ -3,7 +3,9 @@ package com.example.productmanagementservice.database;
 import com.example.productmanagementservice.database.mappers.ApplicationsRowMapper;
 import com.example.productmanagementservice.database.mappers.ProductsDescriptionRowMapper;
 import com.example.productmanagementservice.database.mappers.ProductsRowMapper;
+import com.example.productmanagementservice.database.mappers.UsersRowMapper;
 import com.example.productmanagementservice.entity.Application;
+import com.example.productmanagementservice.entity.User;
 import com.example.productmanagementservice.entity.products.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,6 +24,8 @@ public class DatabaseHandler {
         this.jdbcTemplate = jdbcTemplate;
         this.verificationDatabase = verificationDatabase;
     }
+
+
 
     public void sendApplicationToConfirmation(long idApplication) {
         jdbcTemplate.update("UPDATE applications SET status = '1' WHERE id = ?", idApplication);
@@ -76,6 +80,17 @@ public class DatabaseHandler {
         return verificationDatabase.getUserOfToken(token).getLogin();
     }
 
+    public long getIdByLogin(String login){
+        String query = "select * from users where login = ?";
+        List<User> users = jdbcTemplate.query(query, new Object[] {login}, new UsersRowMapper());
+        return users.get(0).getId();
+    }
+
+    public String getStatusByLogin(String login){
+        String query = "select * from users where login = ?";
+        List<User> users = jdbcTemplate.query(query, new Object[] {login}, new UsersRowMapper());
+        return users.get(0).getSecurity_id()+"";
+    }
     public void approveApplication(long idApplication) {
         String query = "select * from applications where id = ?";
 

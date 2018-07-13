@@ -45,9 +45,10 @@ public class LoginService {
         calendar.add(Calendar.MINUTE, 30);
 
         String token = Jwts.builder()
-                .setSubject(login)
+                .setSubject("" + databaseHandler.getIdByLogin(login))
                 .signWith(SignatureAlgorithm.HS512, login)
                 .setExpiration(calendar.getTime())
+                .setAudience(databaseHandler.getStatusByLogin(login))
                 .compact();
 
         creatorInDatabase.addTokenInDatabase(token, login);

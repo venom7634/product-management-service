@@ -1,0 +1,43 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+   http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+  <changeSet id="2" author="m.ryazanov">
+      <insert tableName="users">
+          <column name="login">katya</column>
+          <column name="password">0502</column>
+          <column name="token"></column>
+          <column name="security">0</column>
+          <column name="name">Katya</column>
+          <column name="description">3 years experience</column>
+      </insert>
+
+      <insert tableName="users">
+          <column name="login">victor</column>
+          <column name="password">1234</column>
+          <column name="token"></column>
+          <column name="security">1</column>
+          <column name="name">Victor</column>
+          <column name="description">student</column>
+      </insert>
+      
+      <insert tableName="products">
+          <column name="name">debit-card</column>
+          <column name="description">Regular client card</column>
+      </insert>
+      <insert tableName="products">
+          <column name="name">credit-card</column>
+          <column name="description">This card have something amount money that you can spend</column>
+      </insert>
+      <insert tableName="products">
+          <column name="name">credit-cash</column>
+          <column name="description">You are given the amount of money that you will return in a period of time</column>
+      </insert>
+
+  </changeSet>
+</databaseChangeLog>
