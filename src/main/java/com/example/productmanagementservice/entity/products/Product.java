@@ -5,6 +5,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class Product {
 
+    public enum type {
+        DEBIT_CARD,
+        CREDIT_CARD,
+        CREDIT_CASH
+    }
+
     String description;
 
     @JsonIgnore

@@ -16,7 +16,6 @@ public class ApplicationsRowMapper implements RowMapper {
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
 
         app.setId(resultSet.getInt("id"));
-        app.setStatus(resultSet.getInt("status"));
         app.setClient_id(resultSet.getInt("client_id"));
 
 

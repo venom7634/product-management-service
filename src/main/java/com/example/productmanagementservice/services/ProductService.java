@@ -1,7 +1,7 @@
 package com.example.productmanagementservice.services;
 
-import com.example.productmanagementservice.database.DatabaseHandler;
-import com.example.productmanagementservice.database.VerificationDatabase;
+import com.example.productmanagementservice.database.handlers.ProductsHandler;
+import com.example.productmanagementservice.database.verificators.UserVerificator;
 import com.example.productmanagementservice.entity.products.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,45 +13,61 @@ import java.util.List;
 @Service
 public class ProductService {
 
-    private final DatabaseHandler databaseHandler;
 
+    private final ProductsHandler productsHandler;
     private final LoginService loginService;
-
-    private final VerificationDatabase verificationDatabase;
+    private final UserVerificator userVerificator;
 
     @Autowired
-    public ProductService(DatabaseHandler databaseHandler, LoginService loginService,
-                          VerificationDatabase verificationDatabase) {
-        this.databaseHandler = databaseHandler;
+    public ProductService(LoginService loginService, UserVerificator userVerificator,
+                          ProductsHandler productsHandler) {
         this.loginService = loginService;
-        this.verificationDatabase = verificationDatabase;
+        this.userVerificator = userVerificator;
+        this.productsHandler = productsHandler;
     }
 
     public Product getDescriptionDebitCard() {
-        return databaseHandler.getProductOfDataBase("debit-card");
+        return getProductOfName("debit-card");
     }
 
     public Product getDescriptionCreditCard() {
-        return databaseHandler.getProductOfDataBase("credit-card");
+        return getProductOfName("credit-card");
     }
 
     public Product getDescriptionCreditCash() {
-        return databaseHandler.getProductOfDataBase("credit-cash");
+        return getProductOfName("credit-cash");
     }
 
     public ResponseEntity<List<Product>> getProductsForClient(String token, long userId) {
         ResponseEntity<List<Product>> responseEntity;
 
-        if (!verificationDatabase.checkTokenInDatabase(token)) {
+        if (!userVerificator.checkTokenInDatabase(token)) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if (!loginService.checkTokenOnValidation(token)) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else if (verificationDatabase.authenticationOfBankEmployee(token)) {
-            responseEntity = new ResponseEntity<>(databaseHandler.getProductsForClient(userId), HttpStatus.OK);
+        } else if (userVerificator.authenticationOfBankEmployee(token)) {
+            responseEntity = new ResponseEntity<>(productsHandler.getProductsForClient(userId), HttpStatus.OK);
         } else {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return responseEntity;
+    }
+
+    public Product getProductOfName(String product) {
+        int id = 0;
+        switch (product) {
+            case "debit-card":
+                id = Product.type.DEBIT_CARD.ordinal() + 1;
+                break;
+            case "credit-card":
+                id = Product.type.CREDIT_CARD.ordinal() + 1;
+                break;
+            case "credit-cash":
+                id = Product.type.CREDIT_CASH.ordinal() + 1;
+                break;
+        }
+
+        return productsHandler.getProductOfDataBase(id);
     }
 
 }

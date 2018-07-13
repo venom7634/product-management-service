@@ -8,8 +8,13 @@ public class Application {
 
     int id;
 
-    @JsonIgnore
-    private int status;
+    public enum status {
+        CREATED,
+        SENT,
+        APPROVED,
+        NEGATIVE
+    }
+
     @JsonIgnore
     private int client_id;
 
@@ -45,14 +50,6 @@ public class Application {
 
     public void setClient_id(int client_id) {
         this.client_id = client_id;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
     }
 
     public String getProduct() {

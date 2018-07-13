@@ -1,8 +1,7 @@
 package com.example.productmanagementservice.services;
 
-import com.example.productmanagementservice.database.CreatorInDatabase;
-import com.example.productmanagementservice.database.DatabaseHandler;
-import com.example.productmanagementservice.database.VerificationDatabase;
+import com.example.productmanagementservice.database.handlers.DataHandler;
+import com.example.productmanagementservice.database.verificators.UserVerificator;
 import com.example.productmanagementservice.entity.data.Token;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,22 +15,20 @@ import java.util.Date;
 
 @Service
 public class LoginService {
-    private final CreatorInDatabase creatorInDatabase;
-    private final DatabaseHandler databaseHandler;
-    private final VerificationDatabase verificationDatabase;
+
+    private final UserVerificator userVerificator;
+    private final DataHandler dataHandler;
 
     @Autowired
-    public LoginService(VerificationDatabase verificationDatabase, CreatorInDatabase creatorInDatabase,
-                        DatabaseHandler databaseHandler) {
-        this.verificationDatabase = verificationDatabase;
-        this.creatorInDatabase = creatorInDatabase;
-        this.databaseHandler = databaseHandler;
+    public LoginService(UserVerificator userVerificator, DataHandler dataHandler) {
+        this.userVerificator = userVerificator;
+        this.dataHandler = dataHandler;
     }
 
     public ResponseEntity<Token> login(String login, String password) {
         ResponseEntity<Token> responseEntity;
 
-        if (verificationDatabase.checkingUser(login, password)) {
+        if (userVerificator.checkingUser(login, password)) {
             responseEntity = new ResponseEntity<>(new Token(createToken(login)), HttpStatus.OK);
         } else {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -45,20 +42,25 @@ public class LoginService {
         calendar.add(Calendar.MINUTE, 30);
 
         String token = Jwts.builder()
-                .setSubject("" + databaseHandler.getIdByLogin(login))
+                .setSubject("" + dataHandler.getIdByLogin(login))
                 .signWith(SignatureAlgorithm.HS512, login)
                 .setExpiration(calendar.getTime())
-                .setAudience(databaseHandler.getStatusByLogin(login))
+                .setAudience(dataHandler.getStatusByLogin(login))
                 .compact();
 
-        creatorInDatabase.addTokenInDatabase(token, login);
+        dataHandler.addTokenInDatabase(token, login);
 
         return token;
     }
 
+    public long getIdByToken(String token) {
+        String key = dataHandler.getLoginByToken(token);
+        return Long.parseLong(Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getSubject());
+    }
+
     public boolean checkTokenOnValidation(String token) {
         Date now = new Date();
-        String key = databaseHandler.getLoginByToken(token);
+        String key = dataHandler.getLoginByToken(token);
         Date dateToken = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getExpiration();
 
         return dateToken.after(now);

@@ -2,11 +2,16 @@ package com.example.productmanagementservice.entity;
 
 public class User {
 
+    public enum access {
+        EMPLOYEE_BANK,
+        CLIENT
+    }
+
     int id;
     String login;
     String password;
-    String token;
     int security_id;
+    String token;
     String name;
     String description;
 
