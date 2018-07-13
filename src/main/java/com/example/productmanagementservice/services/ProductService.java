@@ -1,6 +1,6 @@
 package com.example.productmanagementservice.services;
 
-import com.example.productmanagementservice.database.handlers.ProductsHandler;
+import com.example.productmanagementservice.database.repositories.ProductsRepository;
 import com.example.productmanagementservice.database.verificators.UserVerificator;
 import com.example.productmanagementservice.entity.products.Product;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +14,16 @@ import java.util.List;
 public class ProductService {
 
 
-    private final ProductsHandler productsHandler;
+    private final ProductsRepository productsRepository;
     private final LoginService loginService;
     private final UserVerificator userVerificator;
 
     @Autowired
     public ProductService(LoginService loginService, UserVerificator userVerificator,
-                          ProductsHandler productsHandler) {
+                          ProductsRepository productsRepository) {
         this.loginService = loginService;
         this.userVerificator = userVerificator;
-        this.productsHandler = productsHandler;
+        this.productsRepository = productsRepository;
     }
 
     public Product getDescriptionDebitCard() {
@@ -46,7 +46,7 @@ public class ProductService {
         } else if (!loginService.checkTokenOnValidation(token)) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if (userVerificator.authenticationOfBankEmployee(token)) {
-            responseEntity = new ResponseEntity<>(productsHandler.getProductsForClient(userId), HttpStatus.OK);
+            responseEntity = new ResponseEntity<>(productsRepository.getProductsForClient(userId), HttpStatus.OK);
         } else {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -67,7 +67,7 @@ public class ProductService {
                 break;
         }
 
-        return productsHandler.getProductOfDataBase(id);
+        return productsRepository.getProductOfDataBase(id);
     }
 
 }

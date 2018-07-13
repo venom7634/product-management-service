@@ -1,4 +1,4 @@
-package com.example.productmanagementservice.database.handlers;
+package com.example.productmanagementservice.database.repositories;
 
 import com.example.productmanagementservice.database.mappers.UsersRowMapper;
 import com.example.productmanagementservice.database.verificators.UserVerificator;
@@ -10,13 +10,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class DataHandler {
+public class DataRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final UserVerificator userVerificator;
 
     @Autowired
-    public DataHandler(JdbcTemplate jdbcTemplate, UserVerificator userVerificator) {
+    public DataRepository(JdbcTemplate jdbcTemplate, UserVerificator userVerificator) {
         this.jdbcTemplate = jdbcTemplate;
         this.userVerificator = userVerificator;
     }

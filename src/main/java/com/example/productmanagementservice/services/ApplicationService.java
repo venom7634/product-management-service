@@ -1,8 +1,8 @@
 package com.example.productmanagementservice.services;
 
-import com.example.productmanagementservice.database.handlers.ApplicationsHandler;
-import com.example.productmanagementservice.database.handlers.DataHandler;
-import com.example.productmanagementservice.database.handlers.ProductsHandler;
+import com.example.productmanagementservice.database.repositories.ApplicationsRepository;
+import com.example.productmanagementservice.database.repositories.DataRepository;
+import com.example.productmanagementservice.database.repositories.ProductsRepository;
 import com.example.productmanagementservice.database.verificators.ApplicationVerificator;
 import com.example.productmanagementservice.database.verificators.ProductsVerificator;
 import com.example.productmanagementservice.database.verificators.UserVerificator;
@@ -20,19 +20,19 @@ public class ApplicationService {
     private final ApplicationVerificator applicationVerificator;
     private final ProductsVerificator productsVerificator;
     private final UserVerificator userVerificator;
-    private final ApplicationsHandler applicationsHandler;
-    private final DataHandler dataHandler;
-    private final ProductsHandler productsHandler;
+    private final ApplicationsRepository applicationsRepository;
+    private final DataRepository dataRepository;
+    private final ProductsRepository productsRepository;
     private final LoginService loginService;
 
     @Autowired
-    public ApplicationService(LoginService loginService, ApplicationsHandler applicationsHandler, DataHandler dataHandler,
-                              ProductsHandler productsHandler, ApplicationVerificator applicationVerificator,
+    public ApplicationService(LoginService loginService, ApplicationsRepository applicationsRepository, DataRepository dataRepository,
+                              ProductsRepository productsRepository, ApplicationVerificator applicationVerificator,
                               ProductsVerificator productsVerificator, UserVerificator userVerificator) {
         this.loginService = loginService;
-        this.applicationsHandler = applicationsHandler;
-        this.dataHandler = dataHandler;
-        this.productsHandler = productsHandler;
+        this.applicationsRepository = applicationsRepository;
+        this.dataRepository = dataRepository;
+        this.productsRepository = productsRepository;
         this.applicationVerificator = applicationVerificator;
         this.productsVerificator = productsVerificator;
         this.userVerificator = userVerificator;
@@ -57,7 +57,7 @@ public class ApplicationService {
         ResponseEntity<String> responseEntity;
 
         if (applicationVerificator.verificationOnExistsApplication(idApplication)) {
-            productsHandler.addDebitCardToApplication(idApplication);
+            productsRepository.addDebitCardToApplication(idApplication);
             responseEntity = new ResponseEntity<>(HttpStatus.OK);
         } else {
             responseEntity = checkForAddProduct(token, idApplication);
@@ -72,7 +72,7 @@ public class ApplicationService {
         if (limit < 0 && limit > 1000) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if (applicationVerificator.verificationOnExistsApplication(idApplication)) {
-            productsHandler.addCreditCardToApplication(idApplication, limit);
+            productsRepository.addCreditCardToApplication(idApplication, limit);
             responseEntity = new ResponseEntity<>(HttpStatus.OK);
         } else {
             responseEntity = checkForAddProduct(token, idApplication);
@@ -87,7 +87,7 @@ public class ApplicationService {
         if ((amount <= 0 && amount > 1000) || timeInMonth <= 0) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if (applicationVerificator.verificationOnExistsApplication(idApplication)) {
-            productsHandler.addCreditCashToApplication(idApplication, amount, timeInMonth);
+            productsRepository.addCreditCashToApplication(idApplication, amount, timeInMonth);
             responseEntity = new ResponseEntity<>(HttpStatus.OK);
         } else {
             responseEntity = checkForAddProduct(token, idApplication);
@@ -114,7 +114,7 @@ public class ApplicationService {
         if (checkToken(token)) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else {
-            responseEntity = new ResponseEntity<>(applicationsHandler.getListSentApplicationsOfDataBase
+            responseEntity = new ResponseEntity<>(applicationsRepository.getListSentApplicationsOfDataBase
                     (userVerificator.getUserOfToken(token).getId()), HttpStatus.OK);
         }
 
@@ -133,7 +133,7 @@ public class ApplicationService {
                 checkTotalAmountMoneyHasReachedMax(idApplication)) {
             responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else if (applicationVerificator.verificationOnExistsApplication(idApplication)) {
-            applicationsHandler.sendApplicationToConfirmation(idApplication);
+            applicationsRepository.sendApplicationToConfirmation(idApplication);
             responseEntity = new ResponseEntity<>(HttpStatus.OK);
         } else {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -147,7 +147,7 @@ public class ApplicationService {
         if (checkToken(token)) {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if (userVerificator.authenticationOfBankEmployee(token)) {
-            responseEntity = new ResponseEntity<>(applicationsHandler.getListSentApplicationsOfDataBase(userId), HttpStatus.OK);
+            responseEntity = new ResponseEntity<>(applicationsRepository.getListSentApplicationsOfDataBase(userId), HttpStatus.OK);
         } else {
             responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -165,9 +165,9 @@ public class ApplicationService {
         } else if (checkTotalAmountMoneyHasReachedMax(idApplication)) {
             responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else if (userVerificator.authenticationOfBankEmployee(token)) {
-            applicationsHandler.setNegativeOfAllIdenticalProducts
-                    (productsHandler.getProductOfApplication(idApplication));
-            applicationsHandler.approveApplication(idApplication);
+            applicationsRepository.setNegativeOfAllIdenticalProducts
+                    (productsRepository.getProductOfApplication(idApplication));
+            applicationsRepository.approveApplication(idApplication);
             responseEntity = new ResponseEntity<>(HttpStatus.OK);
         } else {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -183,7 +183,7 @@ public class ApplicationService {
         } else if (!applicationVerificator.checkExistenceOfApplication(idApplication)) {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else if (userVerificator.authenticationOfBankEmployee(token)) {
-            applicationsHandler.negativeApplication(idApplication, reason);
+            applicationsRepository.negativeApplication(idApplication, reason);
             responseEntity = new ResponseEntity<>(HttpStatus.OK);
         } else {
             responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -195,8 +195,8 @@ public class ApplicationService {
         Application result = new Application();
         result.setId(0);
 
-        applicationsHandler.createNewApplicationInDatabase(token);
-        List<Application> applications = applicationsHandler.getAllClientApplications(token);
+        applicationsRepository.createNewApplicationInDatabase(token);
+        List<Application> applications = applicationsRepository.getAllClientApplications(token);
 
         for (Application app : applications) {
             if (app.getId() > result.getId()) {
@@ -209,8 +209,8 @@ public class ApplicationService {
     public boolean checkTotalAmountMoneyHasReachedMax(long idApplication) {
         int totalAmount = 0;
 
-        List<Application> applications = applicationsHandler.getListApprovedApplicationsOfDatabase
-                (applicationsHandler.getUserByIdApplication(idApplication).getId());
+        List<Application> applications = applicationsRepository.getListApprovedApplicationsOfDatabase
+                (applicationsRepository.getUserByIdApplication(idApplication).getId());
 
         for (Application app : applications) {
             if (app.getAmount() != null) {

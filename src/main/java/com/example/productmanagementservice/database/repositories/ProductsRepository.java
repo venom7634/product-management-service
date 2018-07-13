@@ -1,4 +1,4 @@
-package com.example.productmanagementservice.database.handlers;
+package com.example.productmanagementservice.database.repositories;
 
 import com.example.productmanagementservice.database.mappers.ApplicationsRowMapper;
 import com.example.productmanagementservice.database.mappers.ProductsDescriptionRowMapper;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class ProductsHandler {
+public class ProductsRepository {
 
     @Autowired
     JdbcTemplate jdbcTemplate;

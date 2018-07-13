@@ -1,6 +1,6 @@
 package com.example.productmanagementservice.services;
 
-import com.example.productmanagementservice.database.handlers.DataHandler;
+import com.example.productmanagementservice.database.repositories.DataRepository;
 import com.example.productmanagementservice.database.verificators.UserVerificator;
 import com.example.productmanagementservice.entity.data.Token;
 import io.jsonwebtoken.Jwts;
@@ -17,12 +17,12 @@ import java.util.Date;
 public class LoginService {
 
     private final UserVerificator userVerificator;
-    private final DataHandler dataHandler;
+    private final DataRepository dataRepository;
 
     @Autowired
-    public LoginService(UserVerificator userVerificator, DataHandler dataHandler) {
+    public LoginService(UserVerificator userVerificator, DataRepository dataRepository) {
         this.userVerificator = userVerificator;
-        this.dataHandler = dataHandler;
+        this.dataRepository = dataRepository;
     }
 
     public ResponseEntity<Token> login(String login, String password) {
@@ -42,25 +42,25 @@ public class LoginService {
         calendar.add(Calendar.MINUTE, 30);
 
         String token = Jwts.builder()
-                .setSubject("" + dataHandler.getIdByLogin(login))
+                .setSubject("" + dataRepository.getIdByLogin(login))
                 .signWith(SignatureAlgorithm.HS512, login)
                 .setExpiration(calendar.getTime())
-                .setAudience(dataHandler.getStatusByLogin(login))
+                .setAudience(dataRepository.getStatusByLogin(login))
                 .compact();
 
-        dataHandler.addTokenInDatabase(token, login);
+        dataRepository.addTokenInDatabase(token, login);
 
         return token;
     }
 
     public long getIdByToken(String token) {
-        String key = dataHandler.getLoginByToken(token);
+        String key = dataRepository.getLoginByToken(token);
         return Long.parseLong(Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getSubject());
     }
 
     public boolean checkTokenOnValidation(String token) {
         Date now = new Date();
-        String key = dataHandler.getLoginByToken(token);
+        String key = dataRepository.getLoginByToken(token);
         Date dateToken = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getExpiration();
 
         return dateToken.after(now);
