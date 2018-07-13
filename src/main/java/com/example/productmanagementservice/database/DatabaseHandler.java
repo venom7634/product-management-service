@@ -25,30 +25,28 @@ public class DatabaseHandler {
         this.verificationDatabase = verificationDatabase;
     }
 
-
-
     public void sendApplicationToConfirmation(long idApplication) {
         jdbcTemplate.update("UPDATE applications SET status = '1' WHERE id = ?", idApplication);
     }
 
     public void addDebitCardToApplication(long idApplication) {
         jdbcTemplate.update("UPDATE applications SET product = 'debit-card', " +
-                "limitOnCard = null, amount = null, timeInMonth = null " +
+                "limit_on_card = NULL, amount = null, time_in_month = null " +
                 "WHERE id = ?", idApplication);
     }
 
     public void addCreditCardToApplication(long idApplication, int limit) {
-        jdbcTemplate.update("UPDATE applications SET product = 'credit-card',amount = null, timeInMonth = null," +
-                " limitOnCard = ? WHERE id = ?", limit, idApplication);
+        jdbcTemplate.update("UPDATE applications SET product = 'credit-card',amount = null, time_in_month = null," +
+                " limit_on_card = ? WHERE id = ?", limit, idApplication);
     }
 
     public void addCreditCashToApplication(long idApplication, int amount, int timeInMonth) {
-        jdbcTemplate.update("UPDATE applications SET product = 'credit-cash',limitOnCard = null,  amount = ?," +
-                "timeInMonth = ? WHERE id = ?", amount, timeInMonth, idApplication);
+        jdbcTemplate.update("UPDATE applications SET product = 'credit-cash',limit_on_card = null,  amount = ?," +
+                "time_in_month = ? WHERE id = ?", amount, timeInMonth, idApplication);
     }
 
     public List<Application> getListApplicationsOfDataBase(long userId) {
-        String query = "select applications.id, status, client_id, product, limitOnCard, amount, timeInMonth " +
+        String query = "select applications.id, status, client_id, product, limit_on_card, amount, time_in_month " +
                 "from applications " +
                 "INNER JOIN users ON client_id = users.id " +
                 "where client_id = ? AND status = 1";

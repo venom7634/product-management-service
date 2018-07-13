@@ -24,8 +24,9 @@ public class CreatorInDatabase {
 
         List<User> users = jdbcTemplate.query(query, new Object[]{token}, new UsersRowMapper());
 
-        jdbcTemplate.update("INSERT INTO applications (client_id, status) " +
-                "VALUES (?,0)", users.get(0).getId());
+        jdbcTemplate.update("INSERT INTO applications " +
+                "(client_id, status, product, limit_on_card, amount, time_in_month, description) " +
+                "VALUES (?, 0, null, null, null, null, null)", users.get(0).getId());
 
         query = "select * from applications where client_id = ? AND status = ?";
 

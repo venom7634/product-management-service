@@ -37,7 +37,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="client_id" type="int">
-                <constraints unique="true" nullable="false"/>
+                <constraints nullable="false"/>
             </column>
             <column name="status" type="int">
                 <constraints nullable="false"/>
@@ -45,13 +45,13 @@
             <column name="product" type="varchar(20)">
                 <constraints nullable="true"/>
             </column>
-            <column name="limitOnCard" type="int">
+            <column name="limit_on_card" type="int">
                 <constraints nullable="true"/>
             </column>
             <column name="amount" type="int">
                 <constraints nullable="true"/>
             </column>
-            <column name="timeInMonth" type="int">
+            <column name="time_in_month" type="int">
                 <constraints nullable="true"/>
             </column>
             <column name="description" type="nchar(300)">
