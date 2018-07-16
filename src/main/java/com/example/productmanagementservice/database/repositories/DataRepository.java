@@ -25,20 +25,15 @@ public class DataRepository {
         jdbcTemplate.update("UPDATE users SET token = ? WHERE login = ?", token, login);
     }
 
-    public String getLoginByToken(String token) {
-        return userVerificator.getUserOfToken(token).getLogin();
-    }
-
-    public long getIdByLogin(String login) {
+    public List<User> getUsersByLogin(String login){
         String query = "select * from users where login = ?";
-        List<User> users = jdbcTemplate.query(query, new Object[]{login}, new UsersRowMapper());
-        return users.get(0).getId();
+
+        return jdbcTemplate.query(query, new Object[]{login}, new UsersRowMapper());
     }
 
-    public String getStatusByLogin(String login) {
-        String query = "select * from users where login = ?";
-        List<User> users = jdbcTemplate.query(query, new Object[]{login}, new UsersRowMapper());
-        return users.get(0).getSecurity_id() + "";
-    }
+    public List<User> getUsersByToken(String token){
+        String query = "select * from users where token = ?";
 
+        return jdbcTemplate.query(query, new Object[]{token}, new UsersRowMapper());
+    }
 }

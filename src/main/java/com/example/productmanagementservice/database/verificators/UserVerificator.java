@@ -1,15 +1,18 @@
 package com.example.productmanagementservice.database.verificators;
 
-import com.example.productmanagementservice.database.mappers.UsersRowMapper;
+import com.example.productmanagementservice.database.repositories.DataRepository;
 import com.example.productmanagementservice.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Repository
+@Component
 public class UserVerificator {
+
+    @Autowired
+    private DataRepository dataRepository;
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -19,8 +22,7 @@ public class UserVerificator {
     }
 
     public boolean checkingUser(String login, String password) {
-        String query = "select * from users where login = ?";
-        List<User> users = jdbcTemplate.query(query, new Object[]{login}, new UsersRowMapper());
+        List<User> users = dataRepository.getUsersByLogin(login);
 
         if (!users.isEmpty()) {
             return users.get(0).getPassword().equals(password);
@@ -40,9 +42,11 @@ public class UserVerificator {
     }
 
     public User getUserOfToken(String token) {
-        String query = "select * from users where token = ?";
+        List<User> users = dataRepository.getUsersByToken(token);
 
-        List<User> users = jdbcTemplate.query(query, new Object[]{token}, new UsersRowMapper());
+        if(users.isEmpty()){
+            return null;
+        }
 
         return users.get(0);
     }

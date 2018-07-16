@@ -42,10 +42,10 @@ public class LoginService {
         calendar.add(Calendar.MINUTE, 30);
 
         String token = Jwts.builder()
-                .setSubject("" + dataRepository.getIdByLogin(login))
+                .setSubject("" + dataRepository.getUsersByLogin(login).get(0).getId())
                 .signWith(SignatureAlgorithm.HS512, login)
                 .setExpiration(calendar.getTime())
-                .setAudience(dataRepository.getStatusByLogin(login))
+                .setAudience(dataRepository.getUsersByLogin(login).get(0).getSecurity_id()+"")
                 .compact();
 
         dataRepository.addTokenInDatabase(token, login);
@@ -54,13 +54,13 @@ public class LoginService {
     }
 
     public long getIdByToken(String token) {
-        String key = dataRepository.getLoginByToken(token);
+        String key = dataRepository.getUsersByToken(token).get(0).getLogin();
         return Long.parseLong(Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getSubject());
     }
 
     public boolean checkTokenOnValidation(String token) {
         Date now = new Date();
-        String key = dataRepository.getLoginByToken(token);
+        String key = dataRepository.getUsersByToken(token).get(0).getLogin();
         Date dateToken = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getExpiration();
 
         return dateToken.after(now);

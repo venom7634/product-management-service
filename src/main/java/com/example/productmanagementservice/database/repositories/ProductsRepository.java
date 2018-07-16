@@ -44,18 +44,15 @@ public class ProductsRepository {
                 "INNER JOIN users ON users.id = applications.id " +
                 "WHERE applications.status = ? AND users.id = ? ";
 
-        List<Product> products = jdbcTemplate.query(query, new Object[]{Application.status.APPROVED.ordinal(),
+        return jdbcTemplate.query(query, new Object[]{Application.status.APPROVED.ordinal(),
                 userId}, new ProductsRowMapper());
-
-        return products;
     }
 
-    public String getProductOfApplication(long idApplication) {
-        String query = "select * from applications where id = ?";
+    public List<Application> getApplicationsByValues(String product, long idApplication, int status){
+        String query = "select * from applications where product = ? and id = ? and status = ?";
+        return jdbcTemplate.query(query, new Object[]{product,
+                        idApplication, status},
+                new ApplicationsRowMapper());
 
-        List<Application> applications = jdbcTemplate.query(query, new Object[]{idApplication}, new ApplicationsRowMapper());
-
-        return applications.get(0).getProduct();
     }
-
 }

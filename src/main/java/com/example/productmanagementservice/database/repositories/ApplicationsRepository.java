@@ -27,6 +27,26 @@ public class ApplicationsRepository {
                 loginService.getIdByToken(token), Application.status.CREATED.ordinal());
     }
 
+    public List<Application> getApplicationsById(long idApplication){
+        String query = "select * from applications where id = ?";
+        return jdbcTemplate.query(query, new Object[]{idApplication},
+                new ApplicationsRowMapper());
+
+    }
+
+    public List<Application> getApplicationsByIdAndStatus(long idApplication, int status){
+        String query = "select * from applications where id = ? and status = ?";
+        return jdbcTemplate.query(query, new Object[]{idApplication, status},
+                new ApplicationsRowMapper());
+    }
+
+    public List<Application> getUserApplicationsById(long userId, long idApplication){
+        String query = "select * from applications where id = ? and client_id = ?";
+        return jdbcTemplate.query(query,
+                new Object[]{idApplication, userId}, new ApplicationsRowMapper());
+
+    }
+
     public List<Application> getAllClientApplications(String token) {
         String query = "select * from applications where client_id = ? AND status = ?";
         return jdbcTemplate.query(query,
@@ -44,9 +64,8 @@ public class ApplicationsRepository {
                 "INNER JOIN users ON client_id = users.id " +
                 "where client_id = ? AND status = ?";
 
-        List<Application> applications = jdbcTemplate.query(query, new Object[]{userId,
+        return jdbcTemplate.query(query, new Object[]{userId,
                 Application.status.SENT.ordinal()}, new ApplicationsRowMapper());
-        return applications;
     }
 
     public List<Application> getListApprovedApplicationsOfDatabase(long userId) {
@@ -71,11 +90,11 @@ public class ApplicationsRepository {
                 Application.status.NEGATIVE.ordinal(), reason, idApplication);
     }
 
-    public User getUserByIdApplication(long idApplication) {
+    public List<User> getUsersByIdApplication(long idApplication) {
         String query = "select users.id, login, password, token, security, users.name, users.description " +
                 "from users JOIN applications ON users.id = client_id where applications.id = ?";
 
-        return ((List<User>) jdbcTemplate.query(query, new Object[]{idApplication}, new UsersRowMapper())).get(0);
+        return jdbcTemplate.query(query, new Object[]{idApplication}, new UsersRowMapper());
     }
 
 }

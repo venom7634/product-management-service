@@ -1,17 +1,19 @@
 package com.example.productmanagementservice.database.verificators;
 
-import com.example.productmanagementservice.database.mappers.ApplicationsRowMapper;
+import com.example.productmanagementservice.database.repositories.ApplicationsRepository;
 import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Repository
+@Component
 public class ApplicationVerificator {
 
+    @Autowired
+    private ApplicationsRepository applicationsRepository;
     private final JdbcTemplate jdbcTemplate;
     private final UserVerificator userVerificator;
 
@@ -21,22 +23,20 @@ public class ApplicationVerificator {
         this.userVerificator = userVerificator;
     }
 
-    public boolean verificationOnExistsApplication(long idApplication) {
-        Application application = getApplicationOfIdAndStatus(idApplication, 0);
+    public boolean isExistsApplication(long idApplication, int status) {
+        Application application = getApplicationOfIdAndStatus(idApplication, status);
         return !(application == null);
     }
 
     public boolean verificationOfBelongingApplicationToClient(long idApplication, String token) {
         User user = userVerificator.getUserOfToken(token);
 
-        String query = "select * from applications where id = ? and client_id = ?";
-        List<Application> applications = jdbcTemplate.query(query,
-                new Object[]{idApplication, user.getId()}, new ApplicationsRowMapper());
+        List<Application> applications = applicationsRepository.getUserApplicationsById(idApplication,user.getId());
 
         return !applications.isEmpty();
     }
 
-    public boolean checkExistenceOfApplication(long idApplication) {
+    public boolean isExistsApplication(long idApplication) {
         Application application = getApplicationOfId(idApplication);
         return !(application == null);
     }
@@ -53,17 +53,22 @@ public class ApplicationVerificator {
     }
 
     public Application getApplicationOfId(long idApplication) {
-        String query = "select * from applications where id = ?";
-        List<Application> applications = jdbcTemplate.query(query, new Object[]{idApplication},
-                new ApplicationsRowMapper());
+        List<Application> applications = applicationsRepository.getApplicationsById(idApplication);
+
+        if(applications.isEmpty()){
+            return null;
+        }
 
         return applications.get(0);
     }
 
     public Application getApplicationOfIdAndStatus(long idApplication, int status) {
-        String query = "select * from applications where id = ? and status = ?";
-        List<Application> applications = jdbcTemplate.query(query, new Object[]{idApplication, status},
-                new ApplicationsRowMapper());
+        List<Application> applications = applicationsRepository.getApplicationsByIdAndStatus(idApplication, status);
+
+        if(applications.isEmpty()){
+            return null;
+        }
+
         return applications.get(0);
     }
 }
