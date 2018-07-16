@@ -26,7 +26,7 @@ public class ProductsVerificator {
         Application application = applicationVerificator.getApplicationOfId(idApplication);
 
         List<Application> applications = productsRepository.getApplicationsByValues
-                (application.getProduct(),idApplication,Application.status.APPROVED.ordinal());
+                (application.getProduct(), Application.status.APPROVED.ordinal());
 
         return !applications.isEmpty();
     }

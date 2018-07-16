@@ -40,10 +40,14 @@ public class ApplicationsRepository {
                 new ApplicationsRowMapper());
     }
 
-    public List<Application> getUserApplicationsById(long userId, long idApplication){
+    public List<Application> getUserApplicationsById(long idApplication, long userId){
         String query = "select * from applications where id = ? and client_id = ?";
-        return jdbcTemplate.query(query,
+
+        List<Application> applications =
+         jdbcTemplate.query(query,
                 new Object[]{idApplication, userId}, new ApplicationsRowMapper());
+
+        return applications;
 
     }
 

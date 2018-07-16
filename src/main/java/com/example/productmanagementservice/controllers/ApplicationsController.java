@@ -6,7 +6,6 @@ import com.example.productmanagementservice.entity.products.CreditCard;
 import com.example.productmanagementservice.entity.products.CreditCash;
 import com.example.productmanagementservice.services.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,23 +32,20 @@ public class ApplicationsController {
     }
 
     @RequestMapping(value = "/applications/{id}/credit-card", method = RequestMethod.POST)
-    public void addCreditCard(@PathVariable("id") long idApplication,
-                                                @RequestHeader("token") String token,
+    public void addCreditCard(@PathVariable("id") long idApplication, @RequestHeader("token") String token,
                                                 @RequestBody CreditCard creditCard) {
         applicationService.addCreditCardToApplication(token, idApplication, creditCard.getLimit());
     }
 
     @RequestMapping(value = "/applications/{id}/credit-cash", method = RequestMethod.POST)
-    public void addCreditCard(@PathVariable("id") long idApplication,
-                                                @RequestHeader("token") String token,
+    public void addCreditCard(@PathVariable("id") long idApplication, @RequestHeader("token") String token,
                                                 @RequestBody CreditCash creditCash) {
         applicationService.addCreditCashToApplication(token, idApplication, creditCash.getAmount(),
                 creditCash.getTimeInMonth());
     }
 
     @RequestMapping(value = "/applications/{id}", method = RequestMethod.POST)
-    public void sentApplication(@PathVariable("id") long idApplication,
-                                                  @RequestHeader("token") String token) {
+    public void sentApplication(@PathVariable("id") long idApplication, @RequestHeader("token") String token) {
         applicationService.sendApplicationForApproval(token, idApplication);
     }
 
@@ -65,16 +61,14 @@ public class ApplicationsController {
     }
 
     @RequestMapping(value = "/applications/{id}/approve", method = RequestMethod.POST)
-    public void approveApplication(@PathVariable("id") long idApplication,
-                                                     @RequestHeader("token") String token) {
+    public void approveApplication(@PathVariable("id") long idApplication, @RequestHeader("token") String token) {
         applicationService.approveApplication(idApplication, token);
     }
 
     @RequestMapping(value = "/applications/{id}/negative", method = RequestMethod.POST)
-    public ResponseEntity<String> negativeApplication(@PathVariable("id") long idApplication,
-                                                      @RequestHeader("token") String token,
+    public void negativeApplication(@PathVariable("id") long idApplication, @RequestHeader("token") String token,
                                                       @RequestBody Reason reason) {
-        return applicationService.negativeApplication(idApplication, token, reason.getReason());
+        applicationService.negativeApplication(idApplication, token, reason.getReason());
     }
 
 }

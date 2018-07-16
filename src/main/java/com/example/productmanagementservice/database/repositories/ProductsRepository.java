@@ -48,11 +48,9 @@ public class ProductsRepository {
                 userId}, new ProductsRowMapper());
     }
 
-    public List<Application> getApplicationsByValues(String product, long idApplication, int status){
-        String query = "select * from applications where product = ? and id = ? and status = ?";
-        return jdbcTemplate.query(query, new Object[]{product,
-                        idApplication, status},
-                new ApplicationsRowMapper());
+    public List<Application> getApplicationsByValues(String product, int status){
+        String query = "select * from applications where product = ? and status = ?";
+        return jdbcTemplate.query(query, new Object[]{product, status}, new ApplicationsRowMapper());
 
     }
 }

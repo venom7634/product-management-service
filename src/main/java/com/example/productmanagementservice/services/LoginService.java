@@ -7,8 +7,6 @@ import com.example.productmanagementservice.exceptions.NoAccessException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -32,7 +30,6 @@ public class LoginService {
         }
 
         return new Token(createToken(login));
-
     }
 
     private String createToken(String login) {
@@ -43,7 +40,7 @@ public class LoginService {
                 .setSubject("" + dataRepository.getUsersByLogin(login).get(0).getId())
                 .signWith(SignatureAlgorithm.HS512, login)
                 .setExpiration(calendar.getTime())
-                .setAudience(dataRepository.getUsersByLogin(login).get(0).getSecurity_id()+"")
+                .setAudience(dataRepository.getUsersByLogin(login).get(0).getSecurity_id() + "")
                 .compact();
 
         dataRepository.addTokenInDatabase(token, login);

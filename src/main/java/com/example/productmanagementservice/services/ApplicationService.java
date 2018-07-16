@@ -43,7 +43,7 @@ public class ApplicationService {
 
     public Application createApplication(String token) {
         if (!checkToken(token)) {
-            throw new ApplicationNoExistsException();
+            throw new NoAccessException();
         }
         return createNewApplication(token);
     }
@@ -114,9 +114,12 @@ public class ApplicationService {
             throw new NotMatchUserException();
         }
 
-        if (applicationVerificator.checkIsEmptyOfApplication(idApplication) ||
-                checkTotalAmountMoneyHasReachedMax(idApplication)) {
+        if (applicationVerificator.checkIsEmptyOfApplication(idApplication)) {
             throw new IncorrectValueException();
+        }
+
+        if(checkTotalAmountMoneyHasReachedMax(idApplication)){
+            throw new MaxAmountCreditReachedException();
         }
 
         if (applicationVerificator.isExistsApplication(idApplication, 0)) {
@@ -161,8 +164,8 @@ public class ApplicationService {
         if (!applicationVerificator.isExistsApplication(idApplication)) {
             throw new ApplicationNoExistsException();
         }
-        if (!userVerificator.authenticationOfBankEmployee(token) || !checkToken(token)
-                || !applicationVerificator.checkForChangeStatusApplication(idApplication)) {
+        if (userVerificator.authenticationOfBankEmployee(token) || !checkToken(token)
+                || applicationVerificator.checkForChangeStatusApplication(idApplication)) {
             applicationsRepository.negativeApplication(idApplication, reason);
         } else {
             throw new NoAccessException();
