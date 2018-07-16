@@ -5,6 +5,7 @@ import com.example.productmanagementservice.database.verificators.UserVerificato
 import com.example.productmanagementservice.entity.User;
 import com.example.productmanagementservice.entity.data.Token;
 import com.example.productmanagementservice.exceptions.NoAccessException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class LoginService {
 
     private String createToken(String login) {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, 30);
+        calendar.add(Calendar.MINUTE, 1);
 
         User user = dataRepository.getUsersByLogin(login).get(0);
 
@@ -57,10 +58,14 @@ public class LoginService {
     }
 
     public boolean checkTokenOnValidation(String token) {
-        Date now = new Date();
         String key = dataRepository.getUsersByToken(token).get(0).getLogin();
-        Date dateToken = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getExpiration();
 
-        return dateToken.after(now);
+        try {
+            Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getExpiration();
+        } catch (ExpiredJwtException e){
+            return false;
+        }
+
+        return true;
     }
 }

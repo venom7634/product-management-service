@@ -123,7 +123,7 @@ public class ApplicationService {
 
         if (!applicationVerificator.isExistsApplication(idApplication, 0)) {
             throw new ApplicationNoExistsException();
-        } 
+        }
 
         if (checkTotalAmountMoneyHasReachedMax(idApplication)) {
             throw new MaxAmountCreditReachedException();
