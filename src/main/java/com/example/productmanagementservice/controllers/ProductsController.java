@@ -35,7 +35,7 @@ public class ProductsController {
     }
 
     @RequestMapping(value = "/clients/{id}/products", method = RequestMethod.GET)
-    public ResponseEntity<List<Product>> getClientProducts(@PathVariable("id") long userId, @RequestHeader("token") String token) {
+    public List<Product> getClientProducts(@PathVariable("id") long userId, @RequestHeader("token") String token) {
         return productService.getProductsForClient(token, userId);
     }
 }

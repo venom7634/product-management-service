@@ -3,6 +3,7 @@ package com.example.productmanagementservice.services;
 import com.example.productmanagementservice.database.repositories.ProductsRepository;
 import com.example.productmanagementservice.database.verificators.UserVerificator;
 import com.example.productmanagementservice.entity.products.Product;
+import com.example.productmanagementservice.exceptions.NoAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,19 +39,14 @@ public class ProductService {
         return getProductOfName("credit-cash");
     }
 
-    public ResponseEntity<List<Product>> getProductsForClient(String token, long userId) {
-        ResponseEntity<List<Product>> responseEntity;
+    public List<Product> getProductsForClient(String token, long userId) {
 
-        if (!userVerificator.checkTokenInDatabase(token)) {
-            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else if (!loginService.checkTokenOnValidation(token)) {
-            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else if (userVerificator.authenticationOfBankEmployee(token)) {
-            responseEntity = new ResponseEntity<>(productsRepository.getProductsForClient(userId), HttpStatus.OK);
-        } else {
-            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(!userVerificator.checkTokenInDatabase(token) || !loginService.checkTokenOnValidation(token)
+                || !userVerificator.authenticationOfBankEmployee(token)){
+            throw new NoAccessException();
         }
-        return responseEntity;
+
+        return productsRepository.getProductsForClient(userId);
     }
 
     public Product getProductOfName(String product) {

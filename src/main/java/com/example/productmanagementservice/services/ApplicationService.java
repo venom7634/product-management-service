@@ -6,7 +6,8 @@ import com.example.productmanagementservice.database.verificators.ApplicationVer
 import com.example.productmanagementservice.database.verificators.ProductsVerificator;
 import com.example.productmanagementservice.database.verificators.UserVerificator;
 import com.example.productmanagementservice.entity.Application;
-import com.example.productmanagementservice.exceptions.ApplicationNoExistsException;
+import com.example.productmanagementservice.exceptions.*;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,154 +38,135 @@ public class ApplicationService {
     }
 
     public boolean checkToken(String token) {
-        return userVerificator.checkTokenInDatabase(token) || loginService.checkTokenOnValidation(token);
+        return userVerificator.checkTokenInDatabase(token) && loginService.checkTokenOnValidation(token);
     }
 
     public Application createApplication(String token) {
+        if (!checkToken(token)) {
+            throw new ApplicationNoExistsException();
+        }
+        return createNewApplication(token);
+    }
 
+    public void addDebitCardToApplication(String token, long idApplication) {
+        checkForAddProduct(token, idApplication);
+
+        if (applicationVerificator.isExistsApplication(idApplication, 0)) {
+            productsRepository.addDebitCardToApplication(idApplication);
+        } else {
+            throw new ApplicationNoExistsException();
+        }
+    }
+
+    public void addCreditCardToApplication(String token, long idApplication, int limit) {
+        checkForAddProduct(token, idApplication);
+
+        if (limit < 0 && limit > 1000) {
+            throw new IncorrectValueException();
+        }
+
+        if (applicationVerificator.isExistsApplication(idApplication, 0)) {
+            productsRepository.addCreditCardToApplication(idApplication, limit);
+        } else {
+            throw new ApplicationNoExistsException();
+        }
+    }
+
+    public void addCreditCashToApplication(String token, long idApplication, int amount, int timeInMonth) {
+        checkForAddProduct(token, idApplication);
+
+        if ((amount <= 0 && amount > 1000) || timeInMonth <= 0) {
+            throw new IncorrectValueException();
+        }
+
+        if (applicationVerificator.isExistsApplication(idApplication, 0)) {
+            productsRepository.addCreditCashToApplication(idApplication, amount, timeInMonth);
+        } else {
+            throw new ApplicationNoExistsException();
+        }
+    }
+
+    public void checkForAddProduct(String token, long idApplication) {
         if (!checkToken(token)) {
             throw new ApplicationNoExistsException();
         }
 
-        return createNewApplication(token);
+        if (!applicationVerificator.verificationOfBelongingApplicationToClient(idApplication, token)) {
+            throw new NotMatchUserException();
+        }
     }
 
-    public ResponseEntity<String> addDebitCardToApplication(String token, long idApplication) {
-        ResponseEntity<String> responseEntity;
+    public List<Application> getApplicationsForApproval(String token) {
+        if (!checkToken(token)) {
+            throw new NoAccessException();
+        } else {
+            return applicationsRepository.getListSentApplicationsOfDataBase
+                    (userVerificator.getUserOfToken(token).getId());
+        }
+    }
+
+    public void sendApplicationForApproval(String token, long idApplication) {
+        if (!checkToken(token) || productsVerificator.checkProductInApplicationsClient(idApplication)) {
+            throw new NoAccessException();
+        }
+
+        if (!applicationVerificator.verificationOfBelongingApplicationToClient(idApplication, token)) {
+            throw new NotMatchUserException();
+        }
+
+        if (applicationVerificator.checkIsEmptyOfApplication(idApplication) ||
+                checkTotalAmountMoneyHasReachedMax(idApplication)) {
+            throw new IncorrectValueException();
+        }
 
         if (applicationVerificator.isExistsApplication(idApplication, 0)) {
-            productsRepository.addDebitCardToApplication(idApplication);
-            responseEntity = new ResponseEntity<>(HttpStatus.OK);
+            applicationsRepository.sendApplicationToConfirmation(idApplication);
         } else {
-            responseEntity = checkForAddProduct(token, idApplication);
+            throw new ApplicationNoExistsException();
         }
-
-        return responseEntity;
     }
 
-    public ResponseEntity<String> addCreditCardToApplication(String token, long idApplication, int limit) {
-        ResponseEntity<String> responseEntity;
-
-        if (limit < 0 && limit > 1000) {
-            responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else if (applicationVerificator.isExistsApplication(idApplication, 0)) {
-            productsRepository.addCreditCardToApplication(idApplication, limit);
-            responseEntity = new ResponseEntity<>(HttpStatus.OK);
+    public List<Application> getApplicationsClientForApproval(long userId, String token) {
+        if (userVerificator.authenticationOfBankEmployee(token) || !checkToken(token)) {
+            return applicationsRepository.getListSentApplicationsOfDataBase(userId);
         } else {
-            responseEntity = checkForAddProduct(token, idApplication);
+            throw new NoAccessException();
         }
-
-        return responseEntity;
     }
 
-    public ResponseEntity<String> addCreditCashToApplication(String token, long idApplication, int amount, int timeInMonth) {
-        ResponseEntity<String> responseEntity;
-
-        if ((amount <= 0 && amount > 1000) || timeInMonth <= 0) {
-            responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else if (applicationVerificator.isExistsApplication(idApplication, 0)) {
-            productsRepository.addCreditCashToApplication(idApplication, amount, timeInMonth);
-            responseEntity = new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            responseEntity = checkForAddProduct(token, idApplication);
+    public void approveApplication(long idApplication, String token) {
+        if (!checkToken(token) || !applicationVerificator.checkForChangeStatusApplication(idApplication) ||
+                productsVerificator.checkProductInApplicationsClient(idApplication)) {
+            throw new NoAccessException();
         }
-
-        return responseEntity;
-    }
-
-    public ResponseEntity<String> checkForAddProduct(String token, long idApplication) {
-        ResponseEntity<String> responseEntity;
-
-        if (checkToken(token) || !applicationVerificator.verificationOfBelongingApplicationToClient(idApplication, token)) {
-            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else {
-            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return responseEntity;
-    }
-
-    public ResponseEntity<List<Application>> getApplicationsForApproval(String token) {
-        ResponseEntity<List<Application>> responseEntity;
-
-        if (checkToken(token)) {
-            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else {
-            responseEntity = new ResponseEntity<>(applicationsRepository.getListSentApplicationsOfDataBase
-                    (userVerificator.getUserOfToken(token).getId()), HttpStatus.OK);
-        }
-
-        return responseEntity;
-    }
-
-    public ResponseEntity<String> sendApplicationForApproval(String token, long idApplication) {
-        ResponseEntity<String> responseEntity;
 
         if (!applicationVerificator.isExistsApplication(idApplication)) {
-            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else if (checkToken(token) || productsVerificator.checkProductInApplicationsClient(idApplication) ||
-                !applicationVerificator.verificationOfBelongingApplicationToClient(idApplication, token)) {
-            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else if (applicationVerificator.checkIsEmptyOfApplication(idApplication) ||
-                checkTotalAmountMoneyHasReachedMax(idApplication)) {
-            responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else if (applicationVerificator.isExistsApplication(idApplication, 0)) {
-            applicationsRepository.sendApplicationToConfirmation(idApplication);
-            responseEntity = new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new ApplicationNoExistsException();
         }
-        return responseEntity;
-    }
 
-    public ResponseEntity<List<Application>> getApplicationsClientForApproval(long userId, String token) {
-        ResponseEntity<List<Application>> responseEntity;
-
-        if (checkToken(token)) {
-            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else if (userVerificator.authenticationOfBankEmployee(token)) {
-            responseEntity = new ResponseEntity<>(applicationsRepository.getListSentApplicationsOfDataBase(userId), HttpStatus.OK);
-        } else {
-            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        if (checkTotalAmountMoneyHasReachedMax(idApplication)) {
+            throw new IncorrectValueException();
         }
-        return responseEntity;
-    }
 
-    public ResponseEntity<String> approveApplication(long idApplication, String token) {
-        ResponseEntity<String> responseEntity;
-
-        if (checkToken(token) || !applicationVerificator.checkForChangeStatusApplication(idApplication) ||
-                productsVerificator.checkProductInApplicationsClient(idApplication)) {
-            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else if (!applicationVerificator.isExistsApplication(idApplication)) {
-            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else if (checkTotalAmountMoneyHasReachedMax(idApplication)) {
-            responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else if (userVerificator.authenticationOfBankEmployee(token)) {
+        if (userVerificator.authenticationOfBankEmployee(token)) {
             applicationsRepository.setNegativeOfAllIdenticalProducts
                     (applicationsRepository.getApplicationsById(idApplication).get(0).getProduct());
             applicationsRepository.approveApplication(idApplication);
-            responseEntity = new ResponseEntity<>(HttpStatus.OK);
         } else {
-            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new PageNotFoundException();
         }
-        return responseEntity;
     }
 
-    public ResponseEntity<String> negativeApplication(long idApplication, String token, String reason) {
-        ResponseEntity<String> responseEntity;
-
-        if (checkToken(token) || !applicationVerificator.checkForChangeStatusApplication(idApplication)) {
-            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else if (!applicationVerificator.isExistsApplication(idApplication)) {
-            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else if (userVerificator.authenticationOfBankEmployee(token)) {
-            applicationsRepository.negativeApplication(idApplication, reason);
-            responseEntity = new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public void negativeApplication(long idApplication, String token, String reason) {
+        if (!applicationVerificator.isExistsApplication(idApplication)) {
+            throw new ApplicationNoExistsException();
         }
-        return responseEntity;
+        if (!userVerificator.authenticationOfBankEmployee(token) || !checkToken(token)
+                || !applicationVerificator.checkForChangeStatusApplication(idApplication)) {
+            applicationsRepository.negativeApplication(idApplication, reason);
+        } else {
+            throw new NoAccessException();
+        }
     }
 
     public Application createNewApplication(String token) {

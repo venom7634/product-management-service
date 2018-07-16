@@ -3,6 +3,7 @@ package com.example.productmanagementservice.services;
 import com.example.productmanagementservice.database.repositories.DataRepository;
 import com.example.productmanagementservice.database.verificators.UserVerificator;
 import com.example.productmanagementservice.entity.data.Token;
+import com.example.productmanagementservice.exceptions.NoAccessException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,16 +26,13 @@ public class LoginService {
         this.dataRepository = dataRepository;
     }
 
-    public ResponseEntity<Token> login(String login, String password) {
-        ResponseEntity<Token> responseEntity;
-
-        if (userVerificator.checkingUser(login, password)) {
-            responseEntity = new ResponseEntity<>(new Token(createToken(login)), HttpStatus.OK);
-        } else {
-            responseEntity = new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    public Token login(String login, String password) {
+        if (!userVerificator.checkingUser(login, password)) {
+            throw new NoAccessException();
         }
 
-        return responseEntity;
+        return new Token(createToken(login));
+
     }
 
     private String createToken(String login) {

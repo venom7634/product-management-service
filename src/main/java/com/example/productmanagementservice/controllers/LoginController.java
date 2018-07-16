@@ -4,7 +4,6 @@ import com.example.productmanagementservice.entity.data.Account;
 import com.example.productmanagementservice.entity.data.Token;
 import com.example.productmanagementservice.services.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,7 +20,7 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<Token> signUp(@RequestBody Account account) {
+    public Token signUp(@RequestBody Account account) {
         return loginHandler.login(account.getLogin(), account.getPassword());
     }
 }
