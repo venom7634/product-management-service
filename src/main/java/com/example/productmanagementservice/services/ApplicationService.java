@@ -121,15 +121,15 @@ public class ApplicationService {
             throw new IncorrectValueException();
         }
 
+        if (!applicationVerificator.isExistsApplication(idApplication, 0)) {
+            throw new ApplicationNoExistsException();
+        } 
+
         if (checkTotalAmountMoneyHasReachedMax(idApplication)) {
             throw new MaxAmountCreditReachedException();
         }
 
-        if (applicationVerificator.isExistsApplication(idApplication, 0)) {
-            applicationsRepository.sendApplicationToConfirmation(idApplication);
-        } else {
-            throw new ApplicationNoExistsException();
-        }
+        applicationsRepository.sendApplicationToConfirmation(idApplication);
     }
 
     public List<Application> getApplicationsClientForApproval(long userId, String token) {
@@ -146,7 +146,7 @@ public class ApplicationService {
             throw new NoAccessException();
         }
 
-        if (!applicationVerificator.isExistsApplication(idApplication)) {
+        if (!applicationVerificator.isExistsApplication(idApplication, Application.status.SENT.ordinal())) {
             throw new ApplicationNoExistsException();
         }
 
