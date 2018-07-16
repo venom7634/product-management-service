@@ -27,19 +27,19 @@ public class ApplicationsController {
 
     @RequestMapping(value = "/applications/{id}/debit-card", method = RequestMethod.POST)
     public void addDebitCard(@PathVariable("id") long idApplication,
-                                               @RequestHeader("token") String token) {
+                             @RequestHeader("token") String token) {
         applicationService.addDebitCardToApplication(token, idApplication);
     }
 
     @RequestMapping(value = "/applications/{id}/credit-card", method = RequestMethod.POST)
     public void addCreditCard(@PathVariable("id") long idApplication, @RequestHeader("token") String token,
-                                                @RequestBody CreditCard creditCard) {
+                              @RequestBody CreditCard creditCard) {
         applicationService.addCreditCardToApplication(token, idApplication, creditCard.getLimit());
     }
 
     @RequestMapping(value = "/applications/{id}/credit-cash", method = RequestMethod.POST)
     public void addCreditCard(@PathVariable("id") long idApplication, @RequestHeader("token") String token,
-                                                @RequestBody CreditCash creditCash) {
+                              @RequestBody CreditCash creditCash) {
         applicationService.addCreditCashToApplication(token, idApplication, creditCash.getAmount(),
                 creditCash.getTimeInMonth());
     }
@@ -51,7 +51,7 @@ public class ApplicationsController {
 
     @RequestMapping(value = "/applications", method = RequestMethod.GET)
     public List<Application> getListApplicationsClientForApproval(@RequestParam("userId") long userId,
-                                                                                  @RequestHeader("token") String token) {
+                                                                  @RequestHeader("token") String token) {
         return applicationService.getApplicationsClientForApproval(userId, token);
     }
 
@@ -67,7 +67,7 @@ public class ApplicationsController {
 
     @RequestMapping(value = "/applications/{id}/negative", method = RequestMethod.POST)
     public void negativeApplication(@PathVariable("id") long idApplication, @RequestHeader("token") String token,
-                                                      @RequestBody Reason reason) {
+                                    @RequestBody Reason reason) {
         applicationService.negativeApplication(idApplication, token, reason.getReason());
     }
 

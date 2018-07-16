@@ -13,25 +13,23 @@ import java.util.List;
 public class DataRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final UserVerificator userVerificator;
 
     @Autowired
-    public DataRepository(JdbcTemplate jdbcTemplate, UserVerificator userVerificator) {
+    public DataRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.userVerificator = userVerificator;
     }
 
     public void addTokenInDatabase(String token, String login) {
         jdbcTemplate.update("UPDATE users SET token = ? WHERE login = ?", token, login);
     }
 
-    public List<User> getUsersByLogin(String login){
+    public List<User> getUsersByLogin(String login) {
         String query = "select * from users where login = ?";
 
         return jdbcTemplate.query(query, new Object[]{login}, new UsersRowMapper());
     }
 
-    public List<User> getUsersByToken(String token){
+    public List<User> getUsersByToken(String token) {
         String query = "select * from users where token = ?";
 
         return jdbcTemplate.query(query, new Object[]{token}, new UsersRowMapper());

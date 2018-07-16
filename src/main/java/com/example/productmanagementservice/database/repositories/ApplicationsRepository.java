@@ -14,11 +14,14 @@ import java.util.List;
 @Repository
 public class ApplicationsRepository {
 
-    @Autowired
-    JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
+    private final LoginService loginService;
 
     @Autowired
-    LoginService loginService;
+    public ApplicationsRepository(JdbcTemplate jdbcTemplate, LoginService loginService) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.loginService = loginService;
+    }
 
     public void createNewApplicationInDatabase(String token) {
         jdbcTemplate.update("INSERT INTO applications " +
@@ -27,25 +30,25 @@ public class ApplicationsRepository {
                 loginService.getIdByToken(token), Application.status.CREATED.ordinal());
     }
 
-    public List<Application> getApplicationsById(long idApplication){
+    public List<Application> getApplicationsById(long idApplication) {
         String query = "select * from applications where id = ?";
         return jdbcTemplate.query(query, new Object[]{idApplication},
                 new ApplicationsRowMapper());
 
     }
 
-    public List<Application> getApplicationsByIdAndStatus(long idApplication, int status){
+    public List<Application> getApplicationsByIdAndStatus(long idApplication, int status) {
         String query = "select * from applications where id = ? and status = ?";
         return jdbcTemplate.query(query, new Object[]{idApplication, status},
                 new ApplicationsRowMapper());
     }
 
-    public List<Application> getUserApplicationsById(long idApplication, long userId){
+    public List<Application> getUserApplicationsById(long idApplication, long userId) {
         String query = "select * from applications where id = ? and client_id = ?";
 
         List<Application> applications =
-         jdbcTemplate.query(query,
-                new Object[]{idApplication, userId}, new ApplicationsRowMapper());
+                jdbcTemplate.query(query,
+                        new Object[]{idApplication, userId}, new ApplicationsRowMapper());
 
         return applications;
 

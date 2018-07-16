@@ -5,15 +5,12 @@ import com.example.productmanagementservice.database.verificators.UserVerificato
 import com.example.productmanagementservice.entity.products.Product;
 import com.example.productmanagementservice.exceptions.NoAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class ProductService {
-
 
     private final ProductsRepository productsRepository;
     private final LoginService loginService;
@@ -41,8 +38,8 @@ public class ProductService {
 
     public List<Product> getProductsForClient(String token, long userId) {
 
-        if(!userVerificator.checkTokenInDatabase(token) || !loginService.checkTokenOnValidation(token)
-                || !userVerificator.authenticationOfBankEmployee(token)){
+        if (!userVerificator.checkTokenInDatabase(token) || !loginService.checkTokenOnValidation(token)
+                || !userVerificator.authenticationOfBankEmployee(token)) {
             throw new NoAccessException();
         }
 

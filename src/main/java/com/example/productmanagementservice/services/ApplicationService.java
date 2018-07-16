@@ -118,7 +118,7 @@ public class ApplicationService {
             throw new IncorrectValueException();
         }
 
-        if(checkTotalAmountMoneyHasReachedMax(idApplication)){
+        if (checkTotalAmountMoneyHasReachedMax(idApplication)) {
             throw new MaxAmountCreditReachedException();
         }
 
@@ -154,6 +154,7 @@ public class ApplicationService {
         if (userVerificator.authenticationOfBankEmployee(token)) {
             applicationsRepository.setNegativeOfAllIdenticalProducts
                     (applicationsRepository.getApplicationsById(idApplication).get(0).getProduct());
+
             applicationsRepository.approveApplication(idApplication);
         } else {
             throw new PageNotFoundException();

@@ -3,7 +3,6 @@ package com.example.productmanagementservice.database.verificators;
 import com.example.productmanagementservice.database.repositories.DataRepository;
 import com.example.productmanagementservice.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -11,14 +10,12 @@ import java.util.List;
 @Component
 public class UserVerificator {
 
-    @Autowired
-    private DataRepository dataRepository;
+    private final DataRepository dataRepository;
 
-    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public UserVerificator(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public UserVerificator(DataRepository dataRepository) {
+        this.dataRepository = dataRepository;
     }
 
     public boolean checkingUser(String login, String password) {
@@ -44,7 +41,7 @@ public class UserVerificator {
     public User getUserOfToken(String token) {
         List<User> users = dataRepository.getUsersByToken(token);
 
-        if(users.isEmpty()){
+        if (users.isEmpty()) {
             return null;
         }
 

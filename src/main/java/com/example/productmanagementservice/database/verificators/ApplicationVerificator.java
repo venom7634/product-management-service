@@ -4,7 +4,6 @@ import com.example.productmanagementservice.database.repositories.ApplicationsRe
 import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,15 +11,13 @@ import java.util.List;
 @Component
 public class ApplicationVerificator {
 
-    @Autowired
-    private ApplicationsRepository applicationsRepository;
-    private final JdbcTemplate jdbcTemplate;
+    private final ApplicationsRepository applicationsRepository;
     private final UserVerificator userVerificator;
 
     @Autowired
-    public ApplicationVerificator(JdbcTemplate jdbcTemplate, UserVerificator userVerificator) {
-        this.jdbcTemplate = jdbcTemplate;
+    public ApplicationVerificator(UserVerificator userVerificator, ApplicationsRepository applicationsRepository) {
         this.userVerificator = userVerificator;
+        this.applicationsRepository = applicationsRepository;
     }
 
     public boolean isExistsApplication(long idApplication, int status) {
@@ -31,7 +28,7 @@ public class ApplicationVerificator {
     public boolean verificationOfBelongingApplicationToClient(long idApplication, String token) {
         User user = userVerificator.getUserOfToken(token);
 
-        List<Application> applications = applicationsRepository.getUserApplicationsById(idApplication,user.getId());
+        List<Application> applications = applicationsRepository.getUserApplicationsById(idApplication, user.getId());
 
         return !applications.isEmpty();
     }
@@ -55,7 +52,7 @@ public class ApplicationVerificator {
     public Application getApplicationOfId(long idApplication) {
         List<Application> applications = applicationsRepository.getApplicationsById(idApplication);
 
-        if(applications.isEmpty()){
+        if (applications.isEmpty()) {
             return null;
         }
 
@@ -65,7 +62,7 @@ public class ApplicationVerificator {
     public Application getApplicationOfIdAndStatus(long idApplication, int status) {
         List<Application> applications = applicationsRepository.getApplicationsByIdAndStatus(idApplication, status);
 
-        if(applications.isEmpty()){
+        if (applications.isEmpty()) {
             return null;
         }
 
