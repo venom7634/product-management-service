@@ -2,6 +2,7 @@ package com.example.productmanagementservice.services;
 
 import com.example.productmanagementservice.database.repositories.DataRepository;
 import com.example.productmanagementservice.database.verificators.UserVerificator;
+import com.example.productmanagementservice.entity.User;
 import com.example.productmanagementservice.entity.data.Token;
 import com.example.productmanagementservice.exceptions.NoAccessException;
 import io.jsonwebtoken.Jwts;
@@ -36,11 +37,13 @@ public class LoginService {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, 30);
 
+        User user = dataRepository.getUsersByLogin(login).get(0);
+
         String token = Jwts.builder()
-                .setSubject("" + dataRepository.getUsersByLogin(login).get(0).getId())
+                .setSubject("" + user.getId())
                 .signWith(SignatureAlgorithm.HS512, login)
                 .setExpiration(calendar.getTime())
-                .setAudience(dataRepository.getUsersByLogin(login).get(0).getSecurity_id() + "")
+                .setAudience(user.getSecurity_id() + "")
                 .compact();
 
         dataRepository.addTokenInDatabase(token, login);

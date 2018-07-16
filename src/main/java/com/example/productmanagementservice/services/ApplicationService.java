@@ -38,7 +38,10 @@ public class ApplicationService {
     }
 
     public boolean checkToken(String token) {
-        return userVerificator.checkTokenInDatabase(token) && loginService.checkTokenOnValidation(token);
+        if(userVerificator.checkTokenInDatabase(token)){
+            return loginService.checkTokenOnValidation(token);
+        }
+            return false;
     }
 
     public Application createApplication(String token) {

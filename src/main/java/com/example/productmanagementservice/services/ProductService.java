@@ -38,8 +38,12 @@ public class ProductService {
 
     public List<Product> getProductsForClient(String token, long userId) {
 
-        if (!userVerificator.checkTokenInDatabase(token) || !loginService.checkTokenOnValidation(token)
-                || !userVerificator.authenticationOfBankEmployee(token)) {
+        if (userVerificator.checkTokenInDatabase(token)) {
+            if (!loginService.checkTokenOnValidation(token)
+                    || !userVerificator.authenticationOfBankEmployee(token)) {
+                throw new NoAccessException();
+            }
+        } else {
             throw new NoAccessException();
         }
 
