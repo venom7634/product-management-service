@@ -133,7 +133,7 @@ public class ApplicationService {
     }
 
     public List<Application> getApplicationsClientForApproval(long userId, String token) {
-        if (!userVerificator.authenticationOfBankEmployee(token) || !checkToken(token)) {
+        if (userVerificator.authenticationOfBankEmployee(token) || !checkToken(token)) {
             return applicationsRepository.getListSentApplicationsOfDataBase(userId, Application.status.SENT.ordinal());
         } else {
             throw new NoAccessException();
@@ -154,7 +154,7 @@ public class ApplicationService {
             throw new IncorrectValueException();
         }
 
-        if (!userVerificator.authenticationOfBankEmployee(token)) {
+        if (userVerificator.authenticationOfBankEmployee(token)) {
             applicationsRepository.setNegativeOfAllIdenticalProducts
                     (applicationsRepository.getApplicationsById(idApplication).get(0).getProduct(),
                             Application.status.NEGATIVE.ordinal());
@@ -169,7 +169,7 @@ public class ApplicationService {
         if (!applicationVerificator.isExistsApplication(idApplication)) {
             throw new ApplicationNoExistsException();
         }
-        if (!userVerificator.authenticationOfBankEmployee(token) || !checkToken(token)
+        if (userVerificator.authenticationOfBankEmployee(token) || !checkToken(token)
                 || applicationVerificator.checkForChangeStatusApplication(idApplication)) {
             applicationsRepository.negativeApplication(idApplication, reason, Application.status.NEGATIVE.ordinal());
         } else {
