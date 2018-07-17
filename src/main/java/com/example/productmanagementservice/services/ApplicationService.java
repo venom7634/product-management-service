@@ -2,15 +2,13 @@ package com.example.productmanagementservice.services;
 
 import com.example.productmanagementservice.database.repositories.ApplicationsRepository;
 import com.example.productmanagementservice.database.repositories.ProductsRepository;
+import com.example.productmanagementservice.database.repositories.UsersRepository;
 import com.example.productmanagementservice.database.verificators.ApplicationVerificator;
 import com.example.productmanagementservice.database.verificators.ProductsVerificator;
 import com.example.productmanagementservice.database.verificators.UserVerificator;
 import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.exceptions.*;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,17 +22,19 @@ public class ApplicationService {
     private final ApplicationsRepository applicationsRepository;
     private final ProductsRepository productsRepository;
     private final LoginService loginService;
+    private final UsersRepository usersRepository;
 
     @Autowired
     public ApplicationService(LoginService loginService, ApplicationsRepository applicationsRepository,
                               ProductsRepository productsRepository, ApplicationVerificator applicationVerificator,
-                              ProductsVerificator productsVerificator, UserVerificator userVerificator) {
+                              ProductsVerificator productsVerificator, UserVerificator userVerificator, UsersRepository usersRepository) {
         this.loginService = loginService;
         this.applicationsRepository = applicationsRepository;
         this.productsRepository = productsRepository;
         this.applicationVerificator = applicationVerificator;
         this.productsVerificator = productsVerificator;
         this.userVerificator = userVerificator;
+        this.usersRepository = usersRepository;
     }
 
     public boolean checkToken(String token) {
@@ -104,7 +104,7 @@ public class ApplicationService {
             throw new NoAccessException();
         } else {
             return applicationsRepository.getListSentApplicationsOfDataBase
-                    (userVerificator.getUserOfToken(token).getId());
+                    (userVerificator.getUserOfToken(token).getId(), Application.status.SENT.ordinal());
         }
     }
 
@@ -129,12 +129,12 @@ public class ApplicationService {
             throw new MaxAmountCreditReachedException();
         }
 
-        applicationsRepository.sendApplicationToConfirmation(idApplication);
+        applicationsRepository.sendApplicationToConfirmation(idApplication, Application.status.SENT.ordinal());
     }
 
     public List<Application> getApplicationsClientForApproval(long userId, String token) {
         if (userVerificator.authenticationOfBankEmployee(token) || !checkToken(token)) {
-            return applicationsRepository.getListSentApplicationsOfDataBase(userId);
+            return applicationsRepository.getListSentApplicationsOfDataBase(userId, Application.status.SENT.ordinal());
         } else {
             throw new NoAccessException();
         }
@@ -156,9 +156,10 @@ public class ApplicationService {
 
         if (userVerificator.authenticationOfBankEmployee(token)) {
             applicationsRepository.setNegativeOfAllIdenticalProducts
-                    (applicationsRepository.getApplicationsById(idApplication).get(0).getProduct());
+                    (applicationsRepository.getApplicationsById(idApplication).get(0).getProduct(),
+                            Application.status.NEGATIVE.ordinal());
 
-            applicationsRepository.approveApplication(idApplication);
+            applicationsRepository.approveApplication(idApplication, Application.status.APPROVED.ordinal());
         } else {
             throw new PageNotFoundException();
         }
@@ -170,7 +171,7 @@ public class ApplicationService {
         }
         if (userVerificator.authenticationOfBankEmployee(token) || !checkToken(token)
                 || applicationVerificator.checkForChangeStatusApplication(idApplication)) {
-            applicationsRepository.negativeApplication(idApplication, reason);
+            applicationsRepository.negativeApplication(idApplication, reason, Application.status.NEGATIVE.ordinal());
         } else {
             throw new NoAccessException();
         }
@@ -180,8 +181,9 @@ public class ApplicationService {
         Application result = new Application();
         result.setId(0);
 
-        applicationsRepository.createNewApplicationInDatabase(token);
-        List<Application> applications = applicationsRepository.getAllClientApplications(token);
+        applicationsRepository.createNewApplicationInDatabase(loginService.getIdByToken(token), Application.status.CREATED.ordinal());
+        List<Application> applications = applicationsRepository.getAllClientApplications
+                (loginService.getIdByToken(token), Application.status.CREATED.ordinal());
 
         for (Application app : applications) {
             if (app.getId() > result.getId()) {
@@ -195,7 +197,7 @@ public class ApplicationService {
         int totalAmount = 0;
 
         List<Application> applications = applicationsRepository.getListApprovedApplicationsOfDatabase
-                (applicationsRepository.getUsersByIdApplication(idApplication).get(0).getId());
+                (usersRepository.getUsersByIdApplication(idApplication).get(0).getId(), Application.status.APPROVED.ordinal());
 
         for (Application app : applications) {
             if (app.getAmount() != null) {

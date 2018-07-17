@@ -1,56 +1,39 @@
 package com.example.productmanagementservice.database.repositories;
 
-import com.example.productmanagementservice.database.rowmappers.ApplicationsRowMapper;
-import com.example.productmanagementservice.database.rowmappers.ProductsDescriptionRowMapper;
-import com.example.productmanagementservice.database.rowmappers.ProductsRowMapper;
-import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.entity.products.Product;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Mapper
 @Repository
-public class ProductsRepository {
+public interface ProductsRepository {
 
-    @Autowired
-    JdbcTemplate jdbcTemplate;
+    @Select("select * from products where id = #{id}")
+    Product getProductOfDataBase(@Param("id") long id);
 
-    public void addDebitCardToApplication(long idApplication) {
-        jdbcTemplate.update("UPDATE applications SET product = 'debit-card', " +
-                "limit_on_card = NULL, amount = null, time_in_month = null " +
-                "WHERE id = ?", idApplication);
-    }
+    @Update("UPDATE applications SET product = 'debit-card', limit_on_card = NULL, amount = null, " +
+            "time_in_month = null WHERE id = #{id}")
+    void addDebitCardToApplication(@Param("id") long idApplication);
 
-    public void addCreditCardToApplication(long idApplication, int limit) {
-        jdbcTemplate.update("UPDATE applications SET product = 'credit-card',amount = null, time_in_month = null," +
-                " limit_on_card = ? WHERE id = ?", limit, idApplication);
-    }
+    @Update("UPDATE applications SET product = 'credit-card',amount = null, time_in_month = null," +
+            " limit_on_card = #{limitOnCard} WHERE id = {id}")
+    void addCreditCardToApplication(@Param("id") long idApplication, @Param("limitOnCard") int limit);
 
-    public void addCreditCashToApplication(long idApplication, int amount, int timeInMonth) {
-        jdbcTemplate.update("UPDATE applications SET product = 'credit-cash',limit_on_card = null,  amount = ?," +
-                "time_in_month = ? WHERE id = ?", amount, timeInMonth, idApplication);
-    }
+    @Update("UPDATE applications SET product = 'credit-cash',limit_on_card = null,  amount = #{amount}," +
+            "time_in_month = #{timeInMonth} WHERE id = #{id}")
+    void addCreditCashToApplication(@Param("id") long idApplication, @Param("amount") int amount,
+                                           @Param("timeInMonth") int timeInMonth);
 
-    public Product getProductOfDataBase(long id) {
-        String query = "select * from products where id = ?";
-        return (Product) jdbcTemplate.queryForObject(query, new Object[]{id}, new ProductsDescriptionRowMapper());
-    }
+    @Select("SELECT products.id, products.name FROM products " +
+            "INNER JOIN applications ON applications.product = products.name " +
+            "INNER JOIN users ON users.id = applications.id " +
+            "WHERE applications.status = #{status} AND users.id = #{id} ")
+    List<Product> getProductsForClient(@Param("status") int status, @Param("id") long userId);
 
-    public List<Product> getProductsForClient(long userId) {
-        String query = "SELECT products.id, products.name FROM products " +
-                "INNER JOIN applications ON applications.product = products.name " +
-                "INNER JOIN users ON users.id = applications.id " +
-                "WHERE applications.status = ? AND users.id = ? ";
 
-        return jdbcTemplate.query(query, new Object[]{Application.status.APPROVED.ordinal(),
-                userId}, new ProductsRowMapper());
-    }
-
-    public List<Application> getApplicationsByValues(String product, int status) {
-        String query = "select * from applications where product = ? and status = ?";
-        return jdbcTemplate.query(query, new Object[]{product, status}, new ApplicationsRowMapper());
-
-    }
 }

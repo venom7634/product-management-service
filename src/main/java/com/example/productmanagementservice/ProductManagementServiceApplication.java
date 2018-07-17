@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import javax.sql.DataSource;
 
 @SpringBootApplication
-@MapperScan("com.example.productmanagementservice.database.mappers")
+@MapperScan("com.example.productmanagementservice.database.repositories")
 public class ProductManagementServiceApplication {
 
     @Autowired

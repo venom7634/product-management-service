@@ -1,7 +1,6 @@
 package com.example.productmanagementservice.services;
 
-import com.example.productmanagementservice.database.mappers.UsersRepository;
-import com.example.productmanagementservice.database.repositories.DataRepository;
+import com.example.productmanagementservice.database.repositories.UsersRepository;
 import com.example.productmanagementservice.database.verificators.UserVerificator;
 import com.example.productmanagementservice.entity.User;
 import com.example.productmanagementservice.entity.data.Token;
@@ -20,12 +19,10 @@ public class LoginService {
 
     private final UsersRepository usersRepository;
     private final UserVerificator userVerificator;
-    private final DataRepository dataRepository;
 
     @Autowired
-    public LoginService(UserVerificator userVerificator, DataRepository dataRepository, UsersRepository usersRepository) {
+    public LoginService(UserVerificator userVerificator, UsersRepository usersRepository) {
         this.userVerificator = userVerificator;
-        this.dataRepository = dataRepository;
         this.usersRepository = usersRepository;
     }
 
@@ -41,7 +38,7 @@ public class LoginService {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, 1);
 
-        User user = dataRepository.getUsersByLogin(login).get(0);
+        User user = usersRepository.getUsersByLogin(login).get(0);
 
         String token = Jwts.builder()
                 .setSubject("" + user.getId())
@@ -56,12 +53,12 @@ public class LoginService {
     }
 
     public long getIdByToken(String token) {
-        String key = dataRepository.getUsersByToken(token).get(0).getLogin();
+        String key = usersRepository.getUsersByToken(token).get(0).getLogin();
         return Long.parseLong(Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getSubject());
     }
 
     public boolean checkTokenOnValidation(String token) {
-        String key = dataRepository.getUsersByToken(token).get(0).getLogin();
+        String key = usersRepository.getUsersByToken(token).get(0).getLogin();
 
         try {
             Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getExpiration();

@@ -1,6 +1,6 @@
 package com.example.productmanagementservice.database.verificators;
 
-import com.example.productmanagementservice.database.repositories.DataRepository;
+import com.example.productmanagementservice.database.repositories.UsersRepository;
 import com.example.productmanagementservice.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,16 +10,15 @@ import java.util.List;
 @Component
 public class UserVerificator {
 
-    private final DataRepository dataRepository;
-
+    private final UsersRepository usersRepository;
 
     @Autowired
-    public UserVerificator(DataRepository dataRepository) {
-        this.dataRepository = dataRepository;
+    public UserVerificator(UsersRepository usersRepository) {
+        this.usersRepository = usersRepository;
     }
 
     public boolean checkingUser(String login, String password) {
-        List<User> users = dataRepository.getUsersByLogin(login);
+        List<User> users = usersRepository.getUsersByLogin(login);
 
         if (!users.isEmpty()) {
             return users.get(0).getPassword().equals(password);
@@ -39,7 +38,7 @@ public class UserVerificator {
     }
 
     public User getUserOfToken(String token) {
-        List<User> users = dataRepository.getUsersByToken(token);
+        List<User> users = usersRepository.getUsersByToken(token);
 
         if (users.isEmpty()) {
             return null;

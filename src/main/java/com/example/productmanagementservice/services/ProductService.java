@@ -2,6 +2,7 @@ package com.example.productmanagementservice.services;
 
 import com.example.productmanagementservice.database.repositories.ProductsRepository;
 import com.example.productmanagementservice.database.verificators.UserVerificator;
+import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.entity.products.Product;
 import com.example.productmanagementservice.exceptions.NoAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,8 @@ public class ProductService {
     private final UserVerificator userVerificator;
 
     @Autowired
-    public ProductService(LoginService loginService, UserVerificator userVerificator,
-                          ProductsRepository productsRepository) {
+    public ProductService(LoginService loginService, ProductsRepository productsRepository,
+                          UserVerificator userVerificator) {
         this.loginService = loginService;
         this.userVerificator = userVerificator;
         this.productsRepository = productsRepository;
@@ -47,7 +48,7 @@ public class ProductService {
             throw new NoAccessException();
         }
 
-        return productsRepository.getProductsForClient(userId);
+        return productsRepository.getProductsForClient(Application.status.APPROVED.ordinal(),userId);
     }
 
     public Product getProductOfName(String product) {

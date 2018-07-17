@@ -1,107 +1,55 @@
 package com.example.productmanagementservice.database.repositories;
 
-import com.example.productmanagementservice.database.rowmappers.ApplicationsRowMapper;
-import com.example.productmanagementservice.database.rowmappers.UsersRowMapper;
 import com.example.productmanagementservice.entity.Application;
-import com.example.productmanagementservice.entity.User;
-import com.example.productmanagementservice.services.LoginService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Mapper
 @Repository
-public class ApplicationsRepository {
+public interface ApplicationsRepository {
 
-    private final JdbcTemplate jdbcTemplate;
-    private final LoginService loginService;
+    @Insert("INSERT INTO applications " +
+            "(client_id, status, product, limit_on_card, amount, time_in_month, description) " +
+            "VALUES (#{id}, #{status}, null, null, null, null, null)")
+    void createNewApplicationInDatabase(@Param("id") long idUser, @Param("status") int status);
 
-    @Autowired
-    public ApplicationsRepository(JdbcTemplate jdbcTemplate, LoginService loginService) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.loginService = loginService;
-    }
+    @Select("select * from applications where id = #{id}")
+    List<Application> getApplicationsById(@Param("id") long idApplication);
 
-    public void createNewApplicationInDatabase(String token) {
-        jdbcTemplate.update("INSERT INTO applications " +
-                        "(client_id, status, product, limit_on_card, amount, time_in_month, description) " +
-                        "VALUES (?, ?, null, null, null, null, null)",
-                loginService.getIdByToken(token), Application.status.CREATED.ordinal());
-    }
+    @Select("select * from applications where id = #{id} and status = #{status}")
+    List<Application> getApplicationsByIdAndStatus(@Param("id") long idApplication, @Param("status") int status);
 
-    public List<Application> getApplicationsById(long idApplication) {
-        String query = "select * from applications where id = ?";
-        return jdbcTemplate.query(query, new Object[]{idApplication},
-                new ApplicationsRowMapper());
+    @Select("select * from applications where id = #{id} and client_id = #{userId}")
+    List<Application> getUserApplicationsById(@Param("id") long idApplication, @Param("userId") long userId);
 
-    }
+    @Select("select * from applications where client_id = #{userId} AND status = #{status}")
+    List<Application> getAllClientApplications(@Param("userId") long userId, @Param("status") int status);
 
-    public List<Application> getApplicationsByIdAndStatus(long idApplication, int status) {
-        String query = "select * from applications where id = ? and status = ?";
-        return jdbcTemplate.query(query, new Object[]{idApplication, status},
-                new ApplicationsRowMapper());
-    }
+    @Update("UPDATE applications SET status = #{status} WHERE id = #{id}")
+    void sendApplicationToConfirmation(@Param("id") long idApplication, @Param("status") int status);
 
-    public List<Application> getUserApplicationsById(long idApplication, long userId) {
-        String query = "select * from applications where id = ? and client_id = ?";
+    @Select("select applications.id, status, client_id, product, limit_on_card, amount, time_in_month " +
+            "from applications " +
+            "INNER JOIN users ON client_id = users.id " +
+            "where client_id = #{userId} AND status = #{status}")
+    List<Application> getListSentApplicationsOfDataBase(@Param("userId") long userId, @Param("status") int status);
 
-        List<Application> applications =
-                jdbcTemplate.query(query,
-                        new Object[]{idApplication, userId}, new ApplicationsRowMapper());
+    @Select("select * from applications where client_id = #{userId} and status = #{status}")
+    List<Application> getListApprovedApplicationsOfDatabase(@Param("userId") long userId, @Param("status") int status); // params Application.status.APPROVED.ordinal(
 
-        return applications;
+    @Update("UPDATE applications SET status = #{status} WHERE id = #{idApplication")
+    void approveApplication(@Param("idApplication") long idApplication, @Param("status") int status);
 
-    }
+    @Update("UPDATE applications SET status = #{status}, " +
+            "description = 'One user can have only one product of the same type' WHERE product = #{product}")
+    void setNegativeOfAllIdenticalProducts(@Param("product") String product, @Param("status") int status);
 
-    public List<Application> getAllClientApplications(String token) {
-        String query = "select * from applications where client_id = ? AND status = ?";
-        return jdbcTemplate.query(query,
-                new Object[]{loginService.getIdByToken(token), Application.status.CREATED.ordinal()}, new ApplicationsRowMapper());
-    }
+    @Update("UPDATE applications SET status = #{status}, description = #{reason} WHERE id = #{idApplication")
+    void negativeApplication(@Param("idApplication") long idApplication, @Param("reason") String reason,
+                             @Param("status") int status);
 
-    public void sendApplicationToConfirmation(long idApplication) {
-        jdbcTemplate.update("UPDATE applications SET status = ? WHERE id = ?", Application.status.SENT.ordinal(),
-                idApplication);
-    }
-
-    public List<Application> getListSentApplicationsOfDataBase(long userId) {
-        String query = "select applications.id, status, client_id, product, limit_on_card, amount, time_in_month " +
-                "from applications " +
-                "INNER JOIN users ON client_id = users.id " +
-                "where client_id = ? AND status = ?";
-
-        return jdbcTemplate.query(query, new Object[]{userId,
-                Application.status.SENT.ordinal()}, new ApplicationsRowMapper());
-    }
-
-    public List<Application> getListApprovedApplicationsOfDatabase(long userId) {
-        String query = "select * from applications where client_id = ? and status = ?";
-        return jdbcTemplate.query(query, new Object[]{userId,
-                Application.status.APPROVED.ordinal()}, new ApplicationsRowMapper());
-    }
-
-    public void approveApplication(long idApplication) {
-        jdbcTemplate.update("UPDATE applications SET status = ? WHERE id = ?",
-                Application.status.APPROVED.ordinal(), idApplication);
-    }
-
-    public void setNegativeOfAllIdenticalProducts(String product) {
-        jdbcTemplate.update("UPDATE applications SET status = ?, " +
-                        "description = 'One user can have only one product of the same type' WHERE product = ?",
-                Application.status.NEGATIVE.ordinal(), product);
-    }
-
-    public void negativeApplication(long idApplication, String reason) {
-        jdbcTemplate.update("UPDATE applications SET status = ?, description = ? WHERE id = ?",
-                Application.status.NEGATIVE.ordinal(), reason, idApplication);
-    }
-
-    public List<User> getUsersByIdApplication(long idApplication) {
-        String query = "select users.id, login, password, token, security, users.name, users.description " +
-                "from users JOIN applications ON users.id = client_id where applications.id = ?";
-
-        return jdbcTemplate.query(query, new Object[]{idApplication}, new UsersRowMapper());
-    }
-
+    @Select("select * from applications where product = #{product} and status = #{status}")
+    List<Application> getApplicationsByValues(@Param("product") String product, @Param("status") int status);
 }
