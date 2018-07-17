@@ -40,12 +40,12 @@ public class ProductsController {
     }
 
     @RequestMapping(value = "/products/statistics/approvedApplications", method = RequestMethod.GET)
-    public List<Statistic> getStatisticsApprovedApplications(@RequestHeader("token") String token){
+    public List<Statistic> getStatisticsApprovedApplications(@RequestHeader("token") String token) {
         return productService.getStatisticUsesProducts(token);
     }
 
     @RequestMapping(value = "/products/statistics/negativeApplications", method = RequestMethod.GET)
-    public List<Statistic> getStatisticsNegativeApplications(@RequestHeader("token") String token){
+    public List<Statistic> getStatisticsNegativeApplications(@RequestHeader("token") String token) {
         return productService.getStatisticsNegativeApplications(token);
     }
 }

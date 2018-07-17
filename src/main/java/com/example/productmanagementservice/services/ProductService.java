@@ -69,7 +69,7 @@ public class ProductService {
         return productsRepository.getProductOfDataBase(id);
     }
 
-    public List<Statistic> getStatisticUsesProducts(String token){
+    public List<Statistic> getStatisticUsesProducts(String token) {
         if (userVerificator.checkTokenInDatabase(token)) {
             if (!loginService.checkTokenOnValidation(token)
                     || !userVerificator.authenticationOfBankEmployee(token)) {
@@ -82,7 +82,7 @@ public class ProductService {
         return calculatePercent(productsRepository.getApprovedStatistics(Application.status.APPROVED.ordinal()));
     }
 
-    public List<Statistic> getStatisticsNegativeApplications(String token){
+    public List<Statistic> getStatisticsNegativeApplications(String token) {
         if (userVerificator.checkTokenInDatabase(token)) {
             if (!loginService.checkTokenOnValidation(token)
                     || !userVerificator.authenticationOfBankEmployee(token)) {
@@ -102,8 +102,8 @@ public class ProductService {
             count += statistic.getCount();
         }
 
-        for (Statistic statistic : statistics){
-            statistic.setPercent(Math.round(statistic.getCount()/count * 10000)/100.0);
+        for (Statistic statistic : statistics) {
+            statistic.setPercent(Math.round(statistic.getCount() / count * 10000) / 100.0);
         }
 
         return statistics;

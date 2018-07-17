@@ -38,10 +38,10 @@ public class ApplicationService {
     }
 
     public boolean checkToken(String token) {
-        if(userVerificator.checkTokenInDatabase(token)){
+        if (userVerificator.checkTokenInDatabase(token)) {
             return loginService.checkTokenOnValidation(token);
         }
-            return false;
+        return false;
     }
 
     public Application createApplication(String token) {
@@ -168,11 +168,11 @@ public class ApplicationService {
         if (!applicationVerificator.isExistsApplication(idApplication)) {
             throw new ApplicationNoExistsException();
         }
-        if (!applicationVerificator.checkForChangeStatusApplication(idApplication)){
+        if (!applicationVerificator.checkForChangeStatusApplication(idApplication)) {
             throw new NoAccessException();
         }
 
-        if (userVerificator.authenticationOfBankEmployee(token) || !checkToken(token) ) {
+        if (userVerificator.authenticationOfBankEmployee(token) || !checkToken(token)) {
             applicationsRepository.negativeApplication(idApplication, reason, Application.status.NEGATIVE.ordinal());
         } else {
             throw new NoAccessException();

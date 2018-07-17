@@ -47,7 +47,7 @@ public class LoginService {
                 .setAudience(user.getSecurity() + "")
                 .compact();
 
-        usersRepository.addTokenInDatabase(token,login);
+        usersRepository.addTokenInDatabase(token, login);
 
         return token;
     }
@@ -62,7 +62,7 @@ public class LoginService {
 
         try {
             Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getExpiration();
-        } catch (ExpiredJwtException e){
+        } catch (ExpiredJwtException e) {
             return false;
         }
 

@@ -13,7 +13,7 @@ public class Statistic {
     @JsonIgnore
     int count;
 
-    public Statistic(){
+    public Statistic() {
 
     }
 
