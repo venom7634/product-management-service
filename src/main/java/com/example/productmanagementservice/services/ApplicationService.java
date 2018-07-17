@@ -52,9 +52,8 @@ public class ApplicationService {
     }
 
     public void addDebitCardToApplication(String token, long idApplication) {
-        checkForAddProduct(token, idApplication);
-
-        if (applicationVerificator.isExistsApplication(idApplication, 0)) {
+        if (applicationVerificator.isExistsApplication(idApplication, Application.status.CREATED.ordinal())) {
+            checkForAddProduct(token, idApplication);
             productsRepository.addDebitCardToApplication(idApplication);
         } else {
             throw new ApplicationNoExistsException();
@@ -62,30 +61,30 @@ public class ApplicationService {
     }
 
     public void addCreditCardToApplication(String token, long idApplication, int limit) {
-        checkForAddProduct(token, idApplication);
-
-        if (limit < 0 && limit > 1000) {
-            throw new IncorrectValueException();
+        if (!applicationVerificator.isExistsApplication(idApplication, Application.status.CREATED.ordinal())) {
+            throw new ApplicationNoExistsException();
         }
 
-        if (applicationVerificator.isExistsApplication(idApplication, 0)) {
+        checkForAddProduct(token, idApplication);
+
+        if (limit > 0 || limit <= 1000) {
             productsRepository.addCreditCardToApplication(idApplication, limit);
         } else {
-            throw new ApplicationNoExistsException();
+            throw new IncorrectValueException();
         }
     }
 
     public void addCreditCashToApplication(String token, long idApplication, int amount, int timeInMonth) {
-        checkForAddProduct(token, idApplication);
-
-        if ((amount <= 0 && amount > 1000) || timeInMonth <= 0) {
-            throw new IncorrectValueException();
+        if (!applicationVerificator.isExistsApplication(idApplication, Application.status.CREATED.ordinal())) {
+            throw new ApplicationNoExistsException();
         }
 
-        if (applicationVerificator.isExistsApplication(idApplication, 0)) {
+        checkForAddProduct(token, idApplication);
+
+        if ((amount > 0 || amount <= 1000) || timeInMonth > 0) {
             productsRepository.addCreditCashToApplication(idApplication, amount, timeInMonth);
         } else {
-            throw new ApplicationNoExistsException();
+            throw new IncorrectValueException();
         }
     }
 
@@ -169,8 +168,11 @@ public class ApplicationService {
         if (!applicationVerificator.isExistsApplication(idApplication)) {
             throw new ApplicationNoExistsException();
         }
-        if (userVerificator.authenticationOfBankEmployee(token) || !checkToken(token)
-                || applicationVerificator.checkForChangeStatusApplication(idApplication)) {
+        if (!applicationVerificator.checkForChangeStatusApplication(idApplication)){
+            throw new NoAccessException();
+        }
+
+        if (userVerificator.authenticationOfBankEmployee(token) || !checkToken(token) ) {
             applicationsRepository.negativeApplication(idApplication, reason, Application.status.NEGATIVE.ordinal());
         } else {
             throw new NoAccessException();

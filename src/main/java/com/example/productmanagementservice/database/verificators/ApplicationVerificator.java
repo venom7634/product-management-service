@@ -39,7 +39,7 @@ public class ApplicationVerificator {
     }
 
     public boolean checkForChangeStatusApplication(long idApplication) {
-        Application application = getApplicationOfIdAndStatus(idApplication, 1);
+        Application application = getApplicationOfIdAndStatus(idApplication, Application.status.SENT.ordinal());
         return !(application == null);
     }
 
