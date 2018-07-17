@@ -46,7 +46,7 @@ public interface ApplicationsRepository {
             "description = 'One user can have only one product of the same type' WHERE product = #{product}")
     void setNegativeOfAllIdenticalProducts(@Param("product") String product, @Param("status") int status);
 
-    @Update("UPDATE applications SET status = #{status}, description = #{reason} WHERE id = #{idApplication")
+    @Update("UPDATE applications SET status = #{status}, description = #{reason} WHERE id = #{idApplication}")
     void negativeApplication(@Param("idApplication") long idApplication, @Param("reason") String reason,
                              @Param("status") int status);
 
