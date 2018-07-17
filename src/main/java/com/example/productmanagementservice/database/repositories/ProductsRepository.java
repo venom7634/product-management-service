@@ -1,6 +1,7 @@
 package com.example.productmanagementservice.database.repositories;
 
 import com.example.productmanagementservice.entity.products.Product;
+import com.example.productmanagementservice.entity.products.Statistic;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -35,5 +36,9 @@ public interface ProductsRepository {
             "WHERE applications.status = #{status} AND users.id = #{id} ")
     List<Product> getProductsForClient(@Param("status") int status, @Param("id") long userId);
 
+    @Select("SELECT COUNT(id) as count, product FROM applications GROUP BY product, status HAVING status = #{status}")
+    List<Statistic> getApprovedStatistics(@Param("status") int status);
 
+    @Select("SELECT COUNT(id) as count, description as reason FROM applications GROUP BY description, status HAVING status = #{status}")
+    List<Statistic> getNegativeStatistics(@Param("status") int status);
 }

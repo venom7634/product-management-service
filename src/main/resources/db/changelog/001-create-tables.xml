@@ -54,7 +54,7 @@
             <column name="time_in_month" type="int">
                 <constraints nullable="true"/>
             </column>
-            <column name="description" type="nchar(300)">
+            <column name="description" type="varchar(300)">
                 <constraints nullable="true"/>
             </column>
         </createTable>

@@ -6,9 +6,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class Product {
 
     public enum type {
-        DEBIT_CARD,
-        CREDIT_CARD,
-        CREDIT_CASH
+        DEBIT_CARD("debit-card"),
+        CREDIT_CARD("credit-card"),
+        CREDIT_CASH("credit-cash");
+
+        private String name;
+
+        type(String name){
+            this.name = name;
+        }
     }
 
     String description;

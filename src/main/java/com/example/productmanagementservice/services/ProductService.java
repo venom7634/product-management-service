@@ -4,6 +4,7 @@ import com.example.productmanagementservice.database.repositories.ProductsReposi
 import com.example.productmanagementservice.database.verificators.UserVerificator;
 import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.entity.products.Product;
+import com.example.productmanagementservice.entity.products.Statistic;
 import com.example.productmanagementservice.exceptions.NoAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class ProductService {
             throw new NoAccessException();
         }
 
-        return productsRepository.getProductsForClient(Application.status.APPROVED.ordinal(),userId);
+        return productsRepository.getProductsForClient(Application.status.APPROVED.ordinal(), userId);
     }
 
     public Product getProductOfName(String product) {
@@ -68,4 +69,43 @@ public class ProductService {
         return productsRepository.getProductOfDataBase(id);
     }
 
+    public List<Statistic> getStatisticUsesProducts(String token){
+        if (userVerificator.checkTokenInDatabase(token)) {
+            if (!loginService.checkTokenOnValidation(token)
+                    || !userVerificator.authenticationOfBankEmployee(token)) {
+                throw new NoAccessException();
+            }
+        } else {
+            throw new NoAccessException();
+        }
+
+        return calculatePercent(productsRepository.getApprovedStatistics(Application.status.APPROVED.ordinal()));
+    }
+
+    public List<Statistic> getStatisticsNegativeApplications(String token){
+        if (userVerificator.checkTokenInDatabase(token)) {
+            if (!loginService.checkTokenOnValidation(token)
+                    || !userVerificator.authenticationOfBankEmployee(token)) {
+                throw new NoAccessException();
+            }
+        } else {
+            throw new NoAccessException();
+        }
+        return calculatePercent(productsRepository.getNegativeStatistics(Application.status.NEGATIVE.ordinal()));
+    }
+
+
+    public List<Statistic> calculatePercent(List<Statistic> statistics) {
+        double count = 0;
+
+        for (Statistic statistic : statistics) {
+            count += statistic.getCount();
+        }
+
+        for (Statistic statistic : statistics){
+            statistic.setPercent(Math.round(statistic.getCount()/count * 10000)/100.0);
+        }
+
+        return statistics;
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.productmanagementservice.controllers;
 
 import com.example.productmanagementservice.entity.products.Product;
+import com.example.productmanagementservice.entity.products.Statistic;
 import com.example.productmanagementservice.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,5 +37,15 @@ public class ProductsController {
     @RequestMapping(value = "/clients/{id}/products", method = RequestMethod.GET)
     public List<Product> getClientProducts(@PathVariable("id") long userId, @RequestHeader("token") String token) {
         return productService.getProductsForClient(token, userId);
+    }
+
+    @RequestMapping(value = "/products/statistics/approvedApplications", method = RequestMethod.GET)
+    public List<Statistic> getStatisticsApprovedApplications(@RequestHeader("token") String token){
+        return productService.getStatisticUsesProducts(token);
+    }
+
+    @RequestMapping(value = "/products/statistics/negativeApplications", method = RequestMethod.GET)
+    public List<Statistic> getStatisticsNegativeApplications(@RequestHeader("token") String token){
+        return productService.getStatisticsNegativeApplications(token);
     }
 }
