@@ -1,4 +1,4 @@
-package com.example.productmanagementservice.database.mappers;
+package com.example.productmanagementservice.database.rowmappers;
 
 import com.example.productmanagementservice.entity.products.Product;
 import org.springframework.jdbc.core.RowMapper;

@@ -1,7 +1,6 @@
 package com.example.productmanagementservice.database.repositories;
 
-import com.example.productmanagementservice.database.mappers.UsersRowMapper;
-import com.example.productmanagementservice.database.verificators.UserVerificator;
+import com.example.productmanagementservice.database.rowmappers.UsersRowMapper;
 import com.example.productmanagementservice.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

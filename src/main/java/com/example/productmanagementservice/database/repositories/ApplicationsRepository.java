@@ -1,7 +1,7 @@
 package com.example.productmanagementservice.database.repositories;
 
-import com.example.productmanagementservice.database.mappers.ApplicationsRowMapper;
-import com.example.productmanagementservice.database.mappers.UsersRowMapper;
+import com.example.productmanagementservice.database.rowmappers.ApplicationsRowMapper;
+import com.example.productmanagementservice.database.rowmappers.UsersRowMapper;
 import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.entity.User;
 import com.example.productmanagementservice.services.LoginService;

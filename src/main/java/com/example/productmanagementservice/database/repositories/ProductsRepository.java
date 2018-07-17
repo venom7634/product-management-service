@@ -1,8 +1,8 @@
 package com.example.productmanagementservice.database.repositories;
 
-import com.example.productmanagementservice.database.mappers.ApplicationsRowMapper;
-import com.example.productmanagementservice.database.mappers.ProductsDescriptionRowMapper;
-import com.example.productmanagementservice.database.mappers.ProductsRowMapper;
+import com.example.productmanagementservice.database.rowmappers.ApplicationsRowMapper;
+import com.example.productmanagementservice.database.rowmappers.ProductsDescriptionRowMapper;
+import com.example.productmanagementservice.database.rowmappers.ProductsRowMapper;
 import com.example.productmanagementservice.entity.Application;
 import com.example.productmanagementservice.entity.products.Product;
 import org.springframework.beans.factory.annotation.Autowired;

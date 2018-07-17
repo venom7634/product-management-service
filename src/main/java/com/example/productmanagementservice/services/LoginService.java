@@ -1,5 +1,6 @@
 package com.example.productmanagementservice.services;
 
+import com.example.productmanagementservice.database.mappers.UsersRepository;
 import com.example.productmanagementservice.database.repositories.DataRepository;
 import com.example.productmanagementservice.database.verificators.UserVerificator;
 import com.example.productmanagementservice.entity.User;
@@ -12,18 +13,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
-import java.util.Date;
+
 
 @Service
 public class LoginService {
 
+    private final UsersRepository usersRepository;
     private final UserVerificator userVerificator;
     private final DataRepository dataRepository;
 
     @Autowired
-    public LoginService(UserVerificator userVerificator, DataRepository dataRepository) {
+    public LoginService(UserVerificator userVerificator, DataRepository dataRepository, UsersRepository usersRepository) {
         this.userVerificator = userVerificator;
         this.dataRepository = dataRepository;
+        this.usersRepository = usersRepository;
     }
 
     public Token login(String login, String password) {
@@ -47,7 +50,7 @@ public class LoginService {
                 .setAudience(user.getSecurity_id() + "")
                 .compact();
 
-        dataRepository.addTokenInDatabase(token, login);
+        usersRepository.addTokenInDatabase(token,login);
 
         return token;
     }
