@@ -8,7 +8,7 @@
         <id column="id" property="id" />
         <result column="login" property="login" />
         <result column="password" property="password" />
-        <result column="security" property="security_id" />
+        <result column="security" property="security" />
         <result column="token" property="token" />
         <result column="name" property="name" />
         <result column="description" property="description" />

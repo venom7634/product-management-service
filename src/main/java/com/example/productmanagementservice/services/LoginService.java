@@ -44,7 +44,7 @@ public class LoginService {
                 .setSubject("" + user.getId())
                 .signWith(SignatureAlgorithm.HS512, login)
                 .setExpiration(calendar.getTime())
-                .setAudience(user.getSecurity_id() + "")
+                .setAudience(user.getSecurity() + "")
                 .compact();
 
         usersRepository.addTokenInDatabase(token,login);

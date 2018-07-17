@@ -29,7 +29,7 @@ public class UserVerificator {
 
     public boolean authenticationOfBankEmployee(String token) {
         User user = getUserOfToken(token);
-        return user.getSecurity_id() == User.access.EMPLOYEE_BANK.ordinal();
+        return user.getSecurity() == User.access.EMPLOYEE_BANK.ordinal();
     }
 
     public boolean checkTokenInDatabase(String token) {
