@@ -18,8 +18,8 @@ public interface ApplicationsRepository {
     @Select("select * from applications where id = #{id}")
     List<Application> getApplicationsById(@Param("id") long idApplication);
 
-    @Select("select * from applications where id = #{id} and status = #{status}")
-    List<Application> getApplicationsByIdAndStatus(@Param("id") long idApplication, @Param("status") int status);
+    @Select("select * from applications where id = #{idApplication} and status = #{status}")
+    List<Application> getApplicationsByIdAndStatus(@Param("idApplication") long idApplication, @Param("status") int status);
 
     @Select("select * from applications where id = #{id} and client_id = #{userId}")
     List<Application> getUserApplicationsById(@Param("id") long idApplication, @Param("userId") long userId);
@@ -30,7 +30,7 @@ public interface ApplicationsRepository {
     @Update("UPDATE applications SET status = #{status} WHERE id = #{id}")
     void sendApplicationToConfirmation(@Param("id") long idApplication, @Param("status") int status);
 
-    @Select("select applications.id, status, client_id, product, limit_on_card, amount, time_in_month " +
+    @Select("select applications.id, client_id, status, product, limit_on_card as limit, amount, time_in_month " +
             "from applications " +
             "INNER JOIN users ON client_id = users.id " +
             "where client_id = #{userId} AND status = #{status}")
@@ -39,7 +39,7 @@ public interface ApplicationsRepository {
     @Select("select * from applications where client_id = #{userId} and status = #{status}")
     List<Application> getListApprovedApplicationsOfDatabase(@Param("userId") long userId, @Param("status") int status); // params Application.status.APPROVED.ordinal(
 
-    @Update("UPDATE applications SET status = #{status} WHERE id = #{idApplication")
+    @Update("UPDATE applications SET status = #{status}, description = 'Approved' WHERE id = #{idApplication}")
     void approveApplication(@Param("idApplication") long idApplication, @Param("status") int status);
 
     @Update("UPDATE applications SET status = #{status}, " +

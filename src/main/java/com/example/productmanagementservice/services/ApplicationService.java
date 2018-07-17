@@ -109,6 +109,10 @@ public class ApplicationService {
     }
 
     public void sendApplicationForApproval(String token, long idApplication) {
+        if (!applicationVerificator.isExistsApplication(idApplication, 0)) {
+            throw new ApplicationNoExistsException();
+        }
+
         if (!checkToken(token) || productsVerificator.checkProductInApplicationsClient(idApplication)) {
             throw new NoAccessException();
         }
@@ -119,10 +123,6 @@ public class ApplicationService {
 
         if (applicationVerificator.checkIsEmptyOfApplication(idApplication)) {
             throw new IncorrectValueException();
-        }
-
-        if (!applicationVerificator.isExistsApplication(idApplication, 0)) {
-            throw new ApplicationNoExistsException();
         }
 
         if (checkTotalAmountMoneyHasReachedMax(idApplication)) {

@@ -36,7 +36,7 @@ public class LoginService {
 
     private String createToken(String login) {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, 1);
+        calendar.add(Calendar.MINUTE, 30);
 
         User user = usersRepository.getUsersByLogin(login).get(0);
 

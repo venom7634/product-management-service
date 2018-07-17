@@ -21,7 +21,7 @@ public interface ProductsRepository {
     void addDebitCardToApplication(@Param("id") long idApplication);
 
     @Update("UPDATE applications SET product = 'credit-card',amount = null, time_in_month = null," +
-            " limit_on_card = #{limitOnCard} WHERE id = {id}")
+            " limit_on_card = #{limitOnCard} WHERE id = #{id}")
     void addCreditCardToApplication(@Param("id") long idApplication, @Param("limitOnCard") int limit);
 
     @Update("UPDATE applications SET product = 'credit-cash',limit_on_card = null,  amount = #{amount}," +
